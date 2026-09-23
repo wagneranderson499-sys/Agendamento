@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>Acesso - Odivelas Barbearia</title>
+</head>
+
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col justify-between">
+
+  <!-- Header Simplificado -->
+  <header class="bg-black flex items-center justify-between px-4 md:px-8 py-4 border-b border-zinc-800">
+    <div class="flex items-center gap-3">
+      <img src="barbearia (1).png" alt="Logo" class="w-10 h-10 object-cover rounded-full">
+      <h1 class="text-white font-bold uppercase tracking-wider text-lg md:text-2xl">
+        𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘 <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+      </h1>
+    </div>
+    <a href="agendamento.html"
+      class="bg-zinc-800 hover:bg-zinc-700 transition text-zinc-300 font-bold uppercase tracking-widest text-xs px-4 py-2 rounded-xl">
+      Voltar
+    </a>
+  </header>
+
+
+ <!-- Conteúdo Principal -->
+  <main class="flex-1 flex items-center justify-center p-4 bg-gradient-to-br from-black via-zinc-900 to-red-950">
+    <div class="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl p-6 md:p-8">
+
+      <!-- ==================== FORMULÁRIO 1: LOGIN ==================== -->
+      <div id="cardLogin" class="space-y-6">
+        <div class="text-center">
+          <h2 class="text-2xl md:text-3xl font-extrabold uppercase leading-tight tracking-wider">
+            <span class="text-white block">𝕰𝖓𝖙𝖗𝖆𝖗 𝖓𝖆</span>
+            <span class="text-red-600 block">𝕮𝖔𝖓𝖙𝖆</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-2">Digite seus dados para acessar seus agendamentos.</p>
+        </div>
+
+        <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">E-mail</label>
+            <input type="email" required placeholder="seu@email.com"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">Senha</label>
+            <input type="password" required placeholder="••••••••"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <div class="flex justify-end">
+            <a href="#" class="text-xs text-yellow-500 hover:underline">Esqueceu a senha?</a>
+          </div>
+
+          <button type="submit"
+            class="w-full bg-red-600 hover:bg-red-700 transition text-white font-extrabold uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-red-950/50">
+            Entrar
+          </button>
+        </form>
+
+        <div class="text-center border-t border-zinc-800 pt-4 text-xs text-zinc-400">
+          Ainda não tem uma conta? 
+          <button onclick="mudarTela('cadastro')" class="text-yellow-500 font-bold hover:underline">Criar conta</button>
+        </div>
+      </div>
+
+      <!-- ==================== FORMULÁRIO 2: CADASTRO ==================== -->
+      <div id="cardCadastro" class="space-y-6 hidden">
+        <div class="text-center">
+          <h2 class="text-2xl md:text-3xl font-extrabold uppercase leading-tight tracking-wider">
+            <span class="text-white block">𝕮𝖗𝖎𝖆𝖗 𝖘𝖚𝖆</span>
+            <span class="text-red-600 block">𝕮𝖔𝖓𝖙𝖆</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-2">Preencha os campos abaixo para se cadastrar.</p>
+        </div>
+
+        <form id="formCadastro" onsubmit="enviarCodigoConfirmacao(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">Nome Completo</label>
+            <input type="text" required placeholder="Seu nome"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">WhatsApp</label>
+            <input type="tel" required placeholder="(91) 9XXXX-XXXX"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">E-mail</label>
+            <input type="email" id="emailCadastro" required placeholder="seu@email.com"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-1">Senha</label>
+            <input type="password" required placeholder="••••••••"
+              class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-red-600">
+          </div>
+
+          <button type="submit"
+            class="w-full bg-red-600 hover:bg-red-700 transition text-white font-extrabold uppercase tracking-widest py-3 rounded-xl shadow-lg shadow-red-950/50">
+            Continuar para Confirmação
+          </button>
+        </form>
+
+        <div class="text-center border-t border-zinc-800 pt-4 text-xs text-zinc-400">
+          Já tem uma conta? 
+          <button onclick="mudarTela('login')" class="text-yellow-500 font-bold hover:underline">Fazer Login</button>
+        </div>
+      </div>
+
+      <!-- ==================== FORMULÁRIO 3: VERIFICAÇÃO DE E-MAIL ==================== -->
+      <div id="cardConfirmacao" class="space-y-6 hidden">
+        <div class="text-center">
+          <div class="text-4xl mb-2">✉️</div>
+          <h2 class="text-2xl font-extrabold uppercase leading-tight tracking-wider">
+            <span class="text-white block">𝕮𝖔𝖓𝖋𝖎𝖗𝖒𝖊 𝖘𝖊𝖚</span>
+            <span class="text-red-600 block">𝕰-𝖒𝖆𝖎𝖑</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-2">
+            Enviamos um código de verificação para:<br>
+            <strong id="exibirEmailConfirmacao" class="text-yellow-500 font-semibold"></strong>
+          </p>
+        </div>
+
+        <form id="formConfirmacao" onsubmit="validarCodigo(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs uppercase tracking-widest text-zinc-400 mb-2 text-center">Código de 6 Dígitos</label>
+            <div class="flex gap-2 justify-center">
+              <input type="text" maxlength="6" placeholder="123456" required
+                class="w-full text-center tracking-[10px] font-mono text-xl bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none focus:border-red-600">
+            </div>
+          </div>
+
+          <button type="submit"
+            class="w-full bg-green-600 hover:bg-green-700 transition text-white font-extrabold uppercase tracking-widest py-3 rounded-xl shadow-lg">
+            Confirmar e Ativar Conta
+          </button>
+        </form>
+
+        <div class="text-center space-y-2 text-xs">
+          <p class="text-zinc-500">Não recebeu o código? 
+            <button type="button" class="text-yellow-500 hover:underline font-bold">Reenviar</button>
+          </p>
+          <button onclick="mudarTela('cadastro')" class="text-zinc-400 hover:text-white block w-full text-center">
+            ← Alterar e-mail
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-800 py-4 text-center text-zinc-600 text-xs bg-black">
+    © 2026 Odivelas Barbearia — Todos os direitos reservados.
+  </footer>
+
+  <script src="auth.js"></script>
+</body>
+</html>

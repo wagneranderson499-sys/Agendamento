@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <title>Odivelas Barbearia</title>
+</head>
+
+<body class="bg-zinc-900">
+
+  <header class="bg-black flex items-center justify-between px-4 md:px-8 py-4 border-b border-zinc-800">
+
+    <div class="flex items-center gap-3">
+      <img src="barbearia (1).png" alt="Logo Barbearia" class="w-10 h-10 object-cover rounded-full">
+      <h1 class="text-white font-bold uppercase tracking-wider text-lg md:text-3xl">
+        𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘
+        <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+      </h1>
+    </div>
+
+  <button onclick="window.location.href='login.html'"
+  class="bg-red-600 hover:bg-red-700 transition text-white font-bold uppercase tracking-widest text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-xl">
+  Entrar
+</button>
+
+  </header>
+
+  <section
+    class="bg-gradient-to-br from-black via-zinc-900 to-red-950 px-6 md:px-10 py-10 flex flex-col md:flex-row items-center justify-between gap-10">
+
+    <div class="max-w-xl">
+
+      <span
+        class="border border-yellow-500 text-yellow-500 text-xs md:text-sm uppercase tracking-[4px] px-4 py-1 inline-block mb-4">
+        ✦ Barbearia Premium
+      </span>
+
+      <h1 class="text-5xl md:text-7xl font-extrabold leading-none uppercase">
+        <span class="text-white block">𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘</span>
+        <span class="text-red-600 block">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+      </h1>
+
+      <p class="text-zinc-400 uppercase tracking-[6px] mt-4 text-sm md:text-lg">
+        Arte & Estilo
+      </p>
+
+      <p class="text-zinc-300 mt-5 text-base md:text-lg leading-relaxed">
+        Técnica refinada, estilo inconfundível.
+        Cada corte é uma obra de arte para você.
+      </p>
+
+      <div class="flex flex-col sm:flex-row gap-4 mt-8">
+
+        <a href="login.html"
+  class="inline-block bg-red-600 hover:bg-red-700 transition text-white uppercase font-bold tracking-wider px-8 py-4 rounded-xl shadow-lg text-center">
+  Agendar Agora
+</a>
+
+        <button onclick="abrirModal()"
+          class="border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition uppercase font-bold tracking-wider px-8 py-4 rounded-xl">
+          ⭐ Avaliações
+        </button>
+
+      </div>
+
+      <!-- CARROSSEL DE AVALIAÇÕES -->
+      <div class="mt-10 max-w-xl">
+
+        <div class="flex items-center justify-between mb-4">
+
+          <h3 class="text-white font-bold uppercase tracking-[4px] text-sm md:text-base">
+            Avaliações dos Clientes
+          </h3>
+
+          <div class="flex gap-2">
+
+            <button onclick="voltarAvaliacao()"
+              class="w-10 h-10 border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition duration-300 rounded-lg">
+              ←
+            </button>
+
+            <button onclick="proximaAvaliacao()"
+              class="w-10 h-10 border border-yellow-500 text-yellow-500 hover:bg-yellow-500 hover:text-black transition duration-300 rounded-lg">
+              →
+            </button>
+
+          </div>
+
+        </div>
+
+        <div
+          class="relative overflow-hidden rounded-2xl border border-zinc-800 bg-black/80 backdrop-blur-sm shadow-2xl min-h-[220px]">
+
+          <div class="absolute top-0 left-0 w-1.5 h-full bg-red-600"></div>
+
+          <div class="p-6 flex flex-col justify-between h-full">
+
+            <div>
+
+              <div class="flex items-center justify-between mb-3">
+
+                <h4 id="carouselNome" class="text-white font-bold text-lg uppercase">
+                  Nenhuma avaliação ainda
+                </h4>
+
+                <span id="carouselEstrelas" class="text-yellow-500 text-xl">
+                  ☆☆☆☆☆
+                </span>
+
+              </div>
+
+              <p id="carouselComentario" class="text-zinc-300 leading-relaxed text-sm md:text-base min-h-[90px]">
+                Seja o primeiro cliente a avaliar a Odivelas Barbearia.
+              </p>
+
+            </div>
+
+            <div id="carouselIndicadores" class="flex justify-center gap-2 mt-6"></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="w-full md:w-72 flex flex-col gap-4">
+
+      <div
+        class="border-l-4 border-red-600 bg-zinc-900/70 border border-zinc-800 p-5 flex flex-col items-center text-center">
+
+        <img src="barbeiro.png" alt="HS Barbeiro"
+          class="w-32 h-32 object-cover rounded-full border-2 border-yellow-500/50 mb-4 shadow-lg">
+
+        <h2 class="text-white text-2xl font-bold uppercase">
+          HS Barbeiro
+        </h2>
+
+        <p class="text-yellow-500 mt-1">
+          Barbeiro Profissional
+        </p>
+
+      </div>
+
+    </div>
+
+  </section>
+
+  <!-- MODAL DE AVALIAÇÃO (Ajustado) -->
+  <div id="modalAvaliacao"
+    class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 px-4 py-6 overflow-y-auto">
+
+    <div class="w-full max-w-md bg-zinc-950 border border-red-600 rounded-2xl shadow-2xl p-6 relative my-auto">
+
+      <div class="flex items-center justify-between mb-6">
+
+        <div>
+          <h2 class="text-2xl font-extrabold uppercase text-white tracking-wider">
+            Avaliações
+          </h2>
+
+          <p class="text-zinc-400 text-sm mt-1">
+            Conte sua experiência na barbearia
+          </p>
+        </div>
+
+        <button onclick="fecharModal()" type="button" class="text-zinc-400 hover:text-red-500 text-3xl font-bold transition">
+          &times;
+        </button>
+
+      </div>
+
+      <form class="space-y-5" onsubmit="enviarAvaliacao(event)">
+
+        <div>
+          <label for="nomeCliente" class="block text-sm uppercase tracking-widest text-zinc-400 mb-2 font-semibold">
+            Nome do Cliente
+          </label>
+
+          <input id="nomeCliente" type="text" placeholder="Digite seu nome" required
+            class="w-full bg-black border border-zinc-800 focus:border-red-600 focus:ring-2 focus:ring-red-600/30 outline-none text-white px-4 py-3 rounded-lg transition-all">
+        </div>
+
+        <div>
+          <label class="block text-sm uppercase tracking-widest text-zinc-400 mb-3 font-semibold">
+            Sua Nota
+          </label>
+
+          <div class="flex gap-2">
+            <button type="button" onclick="avaliar(1)" class="estrela text-4xl text-zinc-700 hover:text-yellow-500 transition-all focus:outline-none">★</button>
+            <button type="button" onclick="avaliar(2)" class="estrela text-4xl text-zinc-700 hover:text-yellow-500 transition-all focus:outline-none">★</button>
+            <button type="button" onclick="avaliar(3)" class="estrela text-4xl text-zinc-700 hover:text-yellow-500 transition-all focus:outline-none">★</button>
+            <button type="button" onclick="avaliar(4)" class="estrela text-4xl text-zinc-700 hover:text-yellow-500 transition-all focus:outline-none">★</button>
+            <button type="button" onclick="avaliar(5)" class="estrela text-4xl text-zinc-700 hover:text-yellow-500 transition-all focus:outline-none">★</button>
+          </div>
+        </div>
+
+        <div>
+          <label for="comentarioCliente" class="block text-sm uppercase tracking-widest text-zinc-400 mb-2 font-semibold">
+            Comentário
+          </label>
+
+          <textarea id="comentarioCliente" rows="4" placeholder="Descreva sua experiência..." required
+            class="w-full bg-black border border-zinc-800 focus:border-red-600 focus:ring-2 focus:ring-red-600/30 outline-none text-white px-4 py-3 rounded-lg resize-none transition-all"></textarea>
+        </div>
+
+        <button type="submit"
+          class="w-full bg-red-600 hover:bg-red-700 transition-all duration-300 text-white font-extrabold uppercase tracking-[4px] py-4 rounded-xl active:scale-95 shadow-lg shadow-red-950/50">
+          Enviar Avaliação
+        </button>
+
+      </form>
+
+      <!-- HISTÓRICO DE AVALIAÇÕES DENTRO DO MODAL -->
+      <div class="mt-8 border-t border-zinc-800 pt-6">
+        <h3 class="text-white font-bold uppercase text-sm mb-4 tracking-wider">Últimas Avaliações</h3>
+        <div id="listaAvaliacoes" class="max-h-52 overflow-y-auto pr-1 space-y-3"></div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <section class="bg-gradient-to-br from-black via-zinc-900 to-red-950 py-16 px-4 md:px-10">
+
+    <div class="text-center mb-12">
+
+      <span
+        class="border border-yellow-500 text-yellow-500 text-[10px] md:text-sm uppercase tracking-[4px] px-4 py-1 inline-block mb-4">
+        ✦ Serviços Premium
+      </span>
+
+      <h2 class="text-3xl md:text-6xl font-extrabold uppercase">
+        <span class="text-white">𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘</span>
+        <span class="text-red-600">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+      </h2>
+
+      <p class="text-zinc-400 mt-4 max-w-2xl mx-auto text-sm md:text-base">
+        Cortes modernos, acabamento profissional e experiência premium
+        para elevar seu estilo.
+      </p>
+
+    </div>
+
+    <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8">
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="coetenavalhado.jpg" alt="Degradê" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Degradê</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$20</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Corte moderno com acabamento preciso.</p>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="degrade.jpg" alt="Navalhado" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Navalhado</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$25</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Acabamento refinado na navalha.</p>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="barba1.jpg" alt="Barba" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Barba</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$20</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Modelagem profissional e alinhada.</p>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="sobrancelha.jpg" alt="Sobrancelha" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Sobrancelha</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$5</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Acabamento discreto e moderno.</p>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="social.jpg" alt="Social" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Social</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$20</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Corte elegante para qualquer ocasião.</p>
+        </div>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 hover:border-red-600 transition-all duration-300 rounded-2xl overflow-hidden group">
+        <div class="overflow-hidden">
+          <img src="barba.jpg" alt="Corte e Barba" class="w-full h-36 md:h-64 object-cover group-hover:scale-110 transition duration-500">
+        </div>
+        <div class="p-3 md:p-6">
+          <div class="flex items-center justify-between mb-2 md:mb-4">
+            <h3 class="text-white text-sm md:text-2xl font-bold uppercase">Corte + Barba</h3>
+            <span class="text-yellow-500 font-bold text-sm md:text-xl">R$35</span>
+          </div>
+          <p class="text-zinc-400 text-xs md:text-base leading-relaxed">Pacote completo premium.</p>
+        </div>
+      </div>
+
+    </div>
+
+  </section>
+
+  <footer class="bg-black border-t border-zinc-800 mt-16">
+
+    <div class="max-w-6xl mx-auto px-6 md:px-12 py-10 flex flex-col md:flex-row items-center justify-between gap-8">
+
+      <div>
+        <h2 class="text-2xl md:text-3xl font-extrabold uppercase tracking-wider text-white">
+          𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘
+          <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+        </h2>
+
+        <p class="text-zinc-500 mt-2 uppercase tracking-[3px] text-sm">
+          Arte • Estilo • Presença
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-5 text-center md:text-right">
+
+        <a href="https://www.google.com/maps/search/?api=1&query=ODIVELAS+BARBEARIA+Sao+Caetano+de+Odivelas"
+          target="_blank"
+          class="flex items-center justify-center md:justify-end gap-3 text-zinc-300 hover:text-red-500 transition-all duration-300">
+
+          <span class="text-2xl">📍</span>
+
+          <div>
+            <h3 class="uppercase text-xs tracking-[4px] text-zinc-500">Localização</h3>
+            <p class="font-semibold text-sm md:text-base max-w-xs md:max-w-none">
+              Av. Magalhães Barata - Umarizal<br>
+              <span class="text-xs text-zinc-400">São Caetano de Odivelas - PA</span>
+            </p>
+          </div>
+
+        </a>
+
+        <a href="https://instagram.com/odivelas_barbearia" target="_blank"
+          class="flex items-center justify-center md:justify-end gap-3 text-zinc-300 hover:text-yellow-500 transition-all duration-300">
+
+          <img src="instagram.png" alt="Instagram" class="w-7 h-7 object-contain">
+
+          <div>
+            <h3 class="uppercase text-xs tracking-[4px] text-zinc-500">Instagram</h3>
+            <p class="font-semibold">@odivelas_barbearia</p>
+          </div>
+
+        </a>
+
+      </div>
+
+    </div>
+
+    <div class="border-t border-zinc-800 py-5 text-center text-zinc-600 text-sm">
+      © 2026 Odivelas Barbearia — Todos os direitos reservados.
+    </div>
+
+  </footer>
+
+  <script src="java.js"></script>
+</body>
+
+</html>

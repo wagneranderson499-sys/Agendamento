@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>Painel Admin - Odivelas Barbearia</title>
+</head>
+
+<body class="bg-zinc-950 text-white min-h-screen flex flex-col font-sans">
+
+  <!-- Header Admin -->
+  <header class="bg-black border-b border-zinc-800 px-4 md:px-8 py-4 flex justify-between items-center shadow-lg">
+    <div class="flex items-center gap-3">
+      <img src="barbearia (1).png" alt="Logo" class="w-10 h-10 rounded-full border border-yellow-500 shadow-md">
+      <div>
+        <h1 class="font-extrabold uppercase text-lg md:text-xl tracking-wider">
+          <span class="text-white">𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘</span>
+          <span class="text-red-600">𝕬𝖉𝖒𝖎𝖓</span>
+        </h1>
+        <p class="text-[10px] text-zinc-400 uppercase tracking-widest">Painel de Controle</p>
+      </div>
+    </div>
+    <a href="login.html"
+      class="bg-zinc-900 hover:bg-red-600 hover:text-white border border-zinc-800 transition text-zinc-300 font-extrabold uppercase text-xs px-4 py-2 rounded-xl shadow">
+      Sair
+    </a>
+  </header>
+
+  <!-- Container Principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 md:p-8 space-y-8">
+
+    <!-- Indicadores Rápidos (Cards) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mb-1">Cortes Hoje</span>
+        <span class="text-2xl font-black text-white" id="qtdAgendamentosHoje">8</span>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mb-1">Faturamento Hoje</span>
+        <span class="text-2xl font-black text-green-500" id="faturamentoHoje">R$ 180,00</span>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mb-1">Horários Livres</span>
+        <span class="text-2xl font-black text-yellow-500" id="horariosLivres">6</span>
+      </div>
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+        <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mb-1">Bloqueados</span>
+        <span class="text-2xl font-black text-red-600" id="horariosBloqueados">2</span>
+      </div>
+    </div>
+
+    <!-- Navegação de Abas -->
+    <div class="flex gap-2 border-b border-zinc-800 pb-3 overflow-x-auto">
+      <button onclick="trocarAba('abaHorarios')" id="btnAbaHorarios"
+        class="aba-btn bg-red-600 text-white font-extrabold uppercase text-xs px-4 py-2.5 rounded-xl shadow-lg shadow-red-950/50 transition tracking-wider">
+        ⏰ 𝕲𝖊𝖗𝖊𝖓𝖈𝖎𝖆𝖗 𝕳𝖔𝖗𝖆́𝖗𝖎𝖔𝖘
+      </button>
+      <button onclick="trocarAba('abaAgendamentos')" id="btnAbaAgendamentos"
+        class="aba-btn bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-extrabold uppercase text-xs px-4 py-2.5 rounded-xl transition tracking-wider">
+        📅 𝕬𝖌𝖊𝖓𝖉𝖆𝖒𝖊𝖓𝖙𝖔𝖘
+      </button>
+      <button onclick="trocarAba('abaServicos')" id="btnAbaServicos"
+        class="aba-btn bg-zinc-900 hover:bg-zinc-800 text-zinc-400 font-extrabold uppercase text-xs px-4 py-2.5 rounded-xl transition tracking-wider">
+        ✂️ 𝕾𝖊𝖗𝖛𝖎𝖈̧𝖔𝖘
+      </button>
+    </div>
+
+    <!-- ==================== ABA 1: GERENCIAR HORÁRIOS ==================== -->
+    <section id="abaHorarios" class="space-y-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-zinc-950 p-5 rounded-2xl border border-zinc-800 shadow-xl">
+        <div>
+          <h2 class="text-xl md:text-2xl font-extrabold uppercase leading-tight tracking-wider">
+            <span class="text-white">𝕮𝖔𝖓𝖙𝖗𝖔𝖑𝖊 𝖉𝖊</span>
+            <span class="text-red-600">𝕳𝖔𝖗𝖆́𝖗𝖎𝖔𝖘</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-1">Clique no horário para alternar entre Livre e Bloqueado.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="text-xs text-zinc-400 uppercase tracking-widest font-semibold">Data:</label>
+          <input type="date" id="adminDataFiltro" onchange="carregarHorariosAdmin()"
+            class="bg-zinc-900 border border-zinc-800 text-white rounded-xl p-2.5 text-sm focus:outline-none focus:border-red-600">
+        </div>
+      </div>
+
+      <!-- Grade de Horários -->
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <h3 class="text-sm font-extrabold uppercase tracking-widest text-zinc-300">Grade do Dia Selecionado</h3>
+          <div class="flex gap-4 text-xs font-semibold">
+            <span class="flex items-center gap-1.5 text-green-400"><span class="w-3 h-3 bg-green-950 border border-green-500 rounded-full inline-block"></span> Livre</span>
+            <span class="flex items-center gap-1.5 text-yellow-500"><span class="w-3 h-3 bg-yellow-950 border border-yellow-500 rounded-full inline-block"></span> Agendado</span>
+            <span class="flex items-center gap-1.5 text-red-500"><span class="w-3 h-3 bg-red-950 border border-red-600 rounded-full inline-block"></span> Bloqueado</span>
+          </div>
+        </div>
+
+        <div id="gridHorariosAdmin" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+          <!-- Gerado dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== ABA 2: AGENDAMENTOS DO DIA ==================== -->
+    <section id="abaAgendamentos" class="space-y-6 hidden">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl overflow-x-auto">
+        <h2 class="text-xl md:text-2xl font-extrabold uppercase leading-tight tracking-wider mb-4">
+          <span class="text-white">𝕮𝖑𝖎𝖊𝖓𝖙𝖊𝖘</span>
+          <span class="text-red-600">𝕬𝖌𝖊𝖓𝖉𝖆𝖉𝖔𝖘</span>
+        </h2>
+        
+        <table class="w-full text-left border-collapse min-w-[600px]">
+          <thead>
+            <tr class="border-b border-zinc-800 text-xs text-zinc-400 uppercase tracking-wider">
+              <th class="py-3 px-2">Horário</th>
+              <th class="py-3 px-2">Cliente</th>
+              <th class="py-3 px-2">WhatsApp</th>
+              <th class="py-3 px-2">Serviço</th>
+              <th class="py-3 px-2">Valor</th>
+              <th class="py-3 px-2">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaAgendamentos" class="text-sm divide-y divide-zinc-800">
+            <tr>
+              <td class="py-3 px-2 font-black text-yellow-500">09:00</td>
+              <td class="py-3 px-2 font-semibold">Anderson Silva</td>
+              <td class="py-3 px-2 text-zinc-400">(91) 98888-7777</td>
+              <td class="py-3 px-2">Degradê + Barba</td>
+              <td class="py-3 px-2 font-bold text-green-400">R$ 35,00</td>
+              <td class="py-3 px-2 flex gap-2">
+                <button class="bg-green-600/20 text-green-400 hover:bg-green-600 hover:text-white px-3 py-1 rounded-lg text-xs font-bold transition">Concluir</button>
+                <button class="bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white px-3 py-1 rounded-lg text-xs font-bold transition">Cancelar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== ABA 3: SERVIÇOS & PREÇOS ==================== -->
+    <section id="abaServicos" class="space-y-6 hidden">
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 shadow-2xl">
+        <h2 class="text-xl md:text-2xl font-extrabold uppercase leading-tight tracking-wider mb-2">
+          <span class="text-white">𝕾𝖊𝖗𝖛𝖎𝖈̧𝖔𝖘 𝖊</span>
+          <span class="text-red-600">𝕻𝖗𝖊𝖈̧𝖔𝖘</span>
+        </h2>
+        <p class="text-xs text-zinc-400">Gerencie a tabela de preços e os cortes oferecidos na barbearia.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-zinc-800 py-4 text-center text-zinc-600 text-xs bg-black">
+    © 2026 Odivelas Barbearia — Painel Administrativo.
+  </footer>
+
+  <script src="admin.js"></script>
+</body>
+</html>

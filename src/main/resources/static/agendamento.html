@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="style.css">
+  <title>Agendamento - Odivelas Barbearia</title>
+</head>
+
+<body class="bg-zinc-900 text-white">
+
+  <header class="bg-black flex items-center justify-between px-4 md:px-8 py-4 border-b border-zinc-800">
+    <div class="flex items-center gap-3">
+      <img src="barbearia (1).png" alt="Logo" class="w-10 h-10 object-cover rounded-full">
+      <h1 class="text-white font-bold uppercase tracking-wider text-lg md:text-3xl">
+        𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘
+        <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+      </h1>
+    </div>
+    <a href="barbearia.html"
+      class="bg-red-600 hover:bg-red-700 transition text-white font-bold uppercase tracking-widest text-sm px-4 py-2 rounded-xl">
+      Voltar
+    </a>
+  </header>
+
+  <section class="bg-gradient-to-br from-black via-zinc-900 to-red-950 min-h-screen px-4 md:px-10 py-12">
+    <div class="max-w-3xl mx-auto">
+
+      <div class="text-center mb-10">
+        <span class="border border-yellow-500 text-yellow-500 text-xs md:text-sm uppercase tracking-[4px] px-4 py-1 inline-block mb-4">
+          ✦ Reserve seu horário
+        </span>
+        <h2 class="text-3xl md:text-5xl font-extrabold uppercase leading-none">
+          <span class="text-white block">𝕬𝖌𝖊𝖓𝖉𝖊 𝖘𝖊𝖚</span>
+          <span class="text-red-600 block">𝖍𝖔𝖗𝖆́𝖗𝖎𝖔</span>
+        </h2>
+        <p class="text-zinc-400 mt-4 text-sm md:text-base">
+          Escolha o barbeiro, o corte ideal, data e horário para garantir seu atendimento.
+        </p>
+      </div>
+
+      <div class="bg-zinc-950 border border-zinc-800 rounded-2xl shadow-2xl overflow-hidden">
+        <div class="border-l-4 border-red-600 p-6 md:p-8">
+
+          <form id="formAgendamento" class="space-y-8">
+
+            <!-- 1. Seleção de Barbeiro -->
+            <div>
+              <label class="block text-sm uppercase tracking-widest text-zinc-400 mb-3">1. Selecione o Barbeiro</label>
+              <div class="flex gap-3 flex-wrap" id="listaBarbeiros">
+                <button type="button" data-nome="HS Barbeiro" onclick="selecionarBarbeiro(this, 'HS Barbeiro')"
+                  class="barbeiro-btn flex items-center gap-3 border border-red-600 text-white bg-zinc-900/80 rounded-xl px-4 py-3">
+                  <img src="barbeiro.png" alt="HS Barbeiro" class="w-12 h-12 object-cover rounded-full border-2 border-yellow-500">
+                  <div class="text-left">
+                    <span class="block font-bold uppercase text-sm">HS Barbeiro</span>
+                    <span class="text-xs text-yellow-500">Profissional Principal</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            <!-- 2. Seleção de Serviços -->
+            <div>
+              <label class="block text-sm uppercase tracking-widest text-zinc-400 mb-3">2. Selecione o Corte / Serviço</label>
+              <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="listaServicos">
+                
+                <!-- Degradê -->
+                <button type="button" 
+                  data-nome="Degradê" 
+                  data-preco="20" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="degrade.jpg" alt="Degradê" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Degradê</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Corte moderno com acabamento preciso.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                </button>
+
+                <!-- Navalhado -->
+                <button type="button" 
+                  data-nome="Navalhado" 
+                  data-preco="25" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="coetenavalhado.jpg" alt="Navalhado" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Navalhado</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Acabamento refinado na navalha.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 25,00</span>
+                </button>
+
+                <!-- Barba -->
+                <button type="button" 
+                  data-nome="Barba" 
+                  data-preco="20" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="barba1.jpg" alt="Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Barba</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Modelagem profissional e alinhada.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                </button>
+
+                <!-- Sobrancelha -->
+                <button type="button" 
+                  data-nome="Sobrancelha" 
+                  data-preco="5" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="sobrancelha.jpg" alt="Sobrancelha" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Sobrancelha</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Acabamento discreto e moderno.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 5,00</span>
+                </button>
+
+                <!-- Social -->
+                <button type="button" 
+                  data-nome="Social" 
+                  data-preco="20" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="social.jpg" alt="Social" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Social</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Corte elegante para qualquer ocasião.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                </button>
+
+                <!-- Corte + Barba -->
+                <button type="button" 
+                  data-nome="Corte + Barba" 
+                  data-preco="35" 
+                  onclick="selecionarServico(this)"
+                  class="servico-btn group relative border border-zinc-800 bg-zinc-900/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
+                  <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    <img src="barba.jpg" alt="Corte + Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                  </div>
+                  <span class="block font-bold uppercase text-sm text-white">Corte + Barba</span>
+                  <span class="text-zinc-500 text-xs block mb-2">Pacote completo premium.</span>
+                  <span class="text-yellow-500 font-bold text-base">R$ 35,00</span>
+                </button>
+
+              </div>
+            </div>
+<!-- 3. Data e Horário -->
+<div>
+  <label class="block text-sm uppercase tracking-widest text-zinc-400 mb-3">3. Escolha a Data e o Horário</label>
+  <div class="space-y-4">
+    
+    <!-- Input de Data -->
+    <div>
+      <label for="inputData" class="block text-xs text-zinc-400 mb-1">Data do Agendamento</label>
+      <input type="date" id="inputData" required
+        class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none focus:border-red-600">
+    </div>
+
+    <!-- Grid de Horários Dinâmicos -->
+    <div>
+      <label class="block text-xs text-zinc-400 mb-2">Horários Disponíveis (Sessões de 45 min)</label>
+      
+      <div id="containerHorarios" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+        <p class="col-span-full text-xs text-zinc-500 italic">Selecione uma data para carregar os horários.</p>
+      </div>
+
+      <input type="hidden" id="selectHorario" required />
+    </div>
+
+    <!-- Aviso de Tolerância/Antecedência -->
+    <div class="flex items-center gap-3 bg-red-950/40 border border-red-600/40 rounded-xl p-3 text-xs text-red-200">
+      <span class="text-lg">⏰</span>
+      <p>
+        <strong class="font-bold uppercase text-red-500">Atenção:</strong> Recomendamos chegar com pelo menos <strong>5 minutos de antecedência</strong> do seu horário agendado.
+      </p>
+    </div>
+
+  </div>
+</div>
+              </div>
+            </div>
+
+            <!-- 4. Dados do Cliente -->
+            <div>
+              <label class="block text-sm uppercase tracking-widest text-zinc-400 mb-3">4. Seus Dados</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label for="inputNome" class="block text-xs text-zinc-400 mb-1">Seu Nome</label>
+                  <input type="text" id="inputNome" placeholder="Digite seu nome completo" required
+                    class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none focus:border-red-600">
+                </div>
+                <div>
+                  <label for="inputTelefone" class="block text-xs text-zinc-400 mb-1">Seu Telefone (WhatsApp)</label>
+                  <input type="tel" id="inputTelefone" placeholder="(91) 9XXXX-XXXX" required
+                    class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-white focus:outline-none focus:border-red-600">
+                </div>
+              </div>
+            </div>
+
+            <!-- Botão de Confirmação -->
+            <button id="btnConfirmar" type="button" onclick="confirmarAgendamento()"
+              class="w-full bg-red-600 hover:bg-red-700 transition-all duration-300 text-white font-extrabold uppercase tracking-[3px] py-4 rounded-xl shadow-lg shadow-red-950/50">
+              Confirmar Agendamento
+            </button>
+
+          </form>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Modal de Confirmação -->
+  <div id="modalConfirmacao" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden items-center justify-center z-50 px-4">
+    <div class="w-full max-w-md bg-zinc-950 border border-red-600 rounded-2xl shadow-2xl p-6 text-center">
+      <div class="text-5xl mb-4">✅</div>
+      <h2 class="text-2xl font-extrabold uppercase text-white tracking-wider mb-2">Agendado com Sucesso!</h2>
+      <p class="text-zinc-400 text-sm mb-6">Envie o comprovante para o WhatsApp do barbeiro para garantir o horário.</p>
+
+      <div class="bg-black border border-zinc-800 rounded-xl p-4 text-left space-y-2 mb-6">
+        <p class="text-zinc-400 text-sm">Cliente: <span id="modalNome" class="text-white font-bold"></span></p>
+        <p class="text-zinc-400 text-sm">Barbeiro: <span id="modalBarbeiro" class="text-white font-bold"></span></p>
+        <p class="text-zinc-400 text-sm">Serviço: <span id="modalServico" class="text-white font-bold"></span></p>
+        <p class="text-zinc-400 text-sm">Data: <span id="modalData" class="text-white font-bold"></span></p>
+        <p class="text-zinc-400 text-sm">Horário: <span id="modalHorario" class="text-white font-bold"></span></p>
+        <p class="text-zinc-400 text-sm">Total: <span id="modalValor" class="text-yellow-500 font-bold text-base"></span></p>
+      </div>
+
+      <div class="space-y-3">
+        <button onclick="enviarWhatsApp()"
+          class="w-full bg-green-600 hover:bg-green-700 transition text-white font-bold uppercase tracking-widest py-3 rounded-xl flex items-center justify-center gap-2">
+          Enviar via WhatsApp 💬
+        </button>
+        <button onclick="fecharConfirmacao()"
+          class="w-full bg-zinc-800 hover:bg-zinc-700 transition text-zinc-300 font-bold uppercase tracking-widest py-3 rounded-xl">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-black border-t border-zinc-800">
+    <div class="max-w-6xl mx-auto px-6 md:px-12 py-10 flex flex-col md:flex-row items-center justify-between gap-8">
+      <div>
+        <h2 class="text-2xl md:text-3xl font-extrabold uppercase tracking-wider text-white">
+          𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘 <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
+        </h2>
+        <p class="text-zinc-500 mt-2 uppercase tracking-[3px] text-sm">Arte • Estilo • Presença</p>
+      </div>
+      <div class="flex flex-col gap-5 text-center md:text-right">
+        <a href="https://www.google.com/maps/search/?api=1&query=ODIVELAS+BARBEARIA+Sao+Caetano+de+Odivelas"
+          target="_blank"
+          class="flex items-center justify-center md:justify-end gap-3 text-zinc-300 hover:text-red-500 transition-all duration-300">
+          <span class="text-2xl">📍</span>
+          <div>
+            <h3 class="uppercase text-xs tracking-[4px] text-zinc-500">Localização</h3>
+            <p class="font-semibold text-sm">
+              Av. Magalhães Barata - Umarizal<br>
+              <span class="text-xs text-zinc-400">São Caetano de Odivelas - PA</span>
+            </p>
+          </div>
+        </a>
+        <a href="https://instagram.com/odivelas_barbearia" target="_blank"
+          class="flex items-center justify-center md:justify-end gap-3 text-zinc-300 hover:text-yellow-500 transition-all duration-300">
+          <img src="instagram.png" alt="Instagram" class="w-7 h-7 object-contain">
+          <div>
+            <h3 class="uppercase text-xs tracking-[4px] text-zinc-500">Instagram</h3>
+            <p class="font-semibold">@odivelas_barbearia</p>
+          </div>
+        </a>
+      </div>
+    </div>
+    <div class="border-t border-zinc-800 py-5 text-center text-zinc-600 text-sm">
+      © 2026 Odivelas Barbearia — Todos os direitos reservados.
+    </div>
+  </footer>
+
+  <script src="java.js"></script>
+
+</body>
+</html>
