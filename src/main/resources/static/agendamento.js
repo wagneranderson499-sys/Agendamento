@@ -205,8 +205,7 @@ function selecionarHorario(elemento, hora) {
   if (selectHorario) selectHorario.value = hora;
 }
 // O seu número fixo da barbearia com DDI (55)
-const SEU_WHATSAPP_BARBEARIA = '5591985793959';
-async function confirmarAgendamento() {
+const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamento() {
   if (!servicoSelecionado) {
     alert('Por favor, selecione um serviço/corte.');
     return;
@@ -220,7 +219,7 @@ async function confirmarAgendamento() {
     return;
   }
 
-  // 1. Tenta recuperar o usuário logado (seja do Supabase Auth ou do localStorage)
+  // 1. Recupera os dados do usuário logado
   let user = null;
   try {
     const { data } = await supabaseClient.auth.getUser();
@@ -229,17 +228,14 @@ async function confirmarAgendamento() {
     console.log('Sessão do Supabase Auth não encontrada, verificando localStorage...');
   }
 
-  // Tenta pegar o perfil salvo no localStorage durante o login local
   const usuarioLocal = JSON.parse(localStorage.getItem('odivelas_usuario_logado')) || usuarioLogado;
 
-  // Se não houver nenhum login (nem no Supabase e nem local), avisa o cliente
   if (!user && !usuarioLocal) {
     alert('Sua sessão expirou ou você não está logado. Por favor, faça login para agendar.');
     window.location.href = 'login.html';
     return;
   }
 
-  // Define os dados do cliente final
   const clienteAtual = {
     id: user ? user.id : (usuarioLocal?.id || 'USR-' + Date.now()),
     nome: user?.user_metadata?.nome || usuarioLocal?.nome || 'Cliente',
@@ -247,7 +243,7 @@ async function confirmarAgendamento() {
     email: user?.email || usuarioLocal?.email || 'cliente@odivelas.com'
   };
 
-  // 2. GRAVA DIRETO NO SUPABASE
+  // 2. GRAVA NO SUPABASE (Para aparecer na Tela do Admin e no Histórico)
   try {
     const { data: agendamentoSalvo, error: erroSupa } = await supabaseClient
       .from('agendamentos')
@@ -260,19 +256,16 @@ async function confirmarAgendamento() {
           horario: horarioSelecionado,
           status: 'confirmado'
         }
-      ])
-      .select();
+      ]);
 
     if (erroSupa) {
       console.error('Erro ao gravar no Supabase:', erroSupa.message);
-    } else {
-      console.log('Agendamento gravado com sucesso no Supabase!', agendamentoSalvo);
     }
   } catch (err) {
     console.error('Erro de conexão ao salvar no Supabase:', err);
   }
 
-  // 3. GRAVA NO LOCALSTORAGE (Para manter o seu Admin atual funcionando)
+  // 3. GRAVA NO LOCALSTORAGE (Para manter histórico local atualizado)
   const novoAgendamentoLocal = {
     id: 'AGN-' + Date.now(),
     clienteId: clienteAtual.id,
@@ -292,14 +285,12 @@ async function confirmarAgendamento() {
   agendamentosLocais.push(novoAgendamentoLocal);
   localStorage.setItem('odivelas_agendamentos', JSON.stringify(agendamentosLocais));
 
-  // 4. MENSAGEM WHATSAPP E REDIRECIONAMENTO
- // 4. MENSAGEM WHATSAPP E EXIBIÇÃO DO MODAL
+  // 4. MONTA A MENSAGEM DO WHATSAPP
   const partesData = dataSelecionada.split('-');
   const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
   const precoFormatado = Number(servicoSelecionado.preco).toFixed(2).replace('.', ',');
 
-  // Insira o número do WhatsApp da barbearia (55 + DDD + Número)
-  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "55919XXXXXXX";
+  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591985793959"; // Seu número com DDD (ex: 5591980000000)
 
   const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
     `👤 *Cliente:* ${clienteAtual.nome}\n` +
@@ -311,37 +302,13 @@ async function confirmarAgendamento() {
 
   const linkZap = `https://wa.me/${numeroBarbeiro}?text=${encodeURIComponent(mensagemWhatsApp)}`;
 
-  // Injeta o link no botão do WhatsApp no modal
-  const btnEnviarZap = document.getElementById('btnEnviarZap');
-  if (btnEnviarZap) {
-    btnEnviarZap.href = linkZap;
-  }
+  // 5. REDIRECIONA PARA O MEUS-AGENDAMENTOS E ABRE O WHATSAPP IMEDIATAMENTE
+  // Primeiro mudamos a aba atual para o histórico do cliente
+  window.location.href = 'meus-agendamentos.html';
 
-  // Abre o modal na tela
-  const modal = document.getElementById('modalSucesso');
-  if (modal) {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  } else {
-    // Backup para celular se o modal não for encontrado
-    window.location.href = linkZap;
-  }
+  // Em seguida (no mesmo instante), acionamos a abertura do WhatsApp
+  window.open(linkZap, '_blank') || (window.location.href = linkZap);
 }
-  const modal = document.getElementById('modalSucesso');
-  if (modal) {
-    modal.classList.remove('hidden');
-    modal.classList.add('flex');
-  }
-
-  // Abre o WhatsApp imediatamente no clique (evita bloqueio de popup)
-  window.open(linkZap, '_blank');
-
-  // Redireciona a página atual após breve pausa
-  setTimeout(() => {
-    window.location.href = 'meus-agendamentos.html';
-  }, 1500);
-
-
 // Busca os servicos e preços atualizados direto da tabela do Supabase
 async function obterServicosDoSupabase() {
   try {
