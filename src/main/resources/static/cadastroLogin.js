@@ -115,17 +115,16 @@ function solicitarRecuperacao() {
    3. HANDLERS DE FORMULÁRIO (PADRONIZADO COM LOCALSTORAGE)
    ========================================================================== */
 
-/**
- * Processa o LOGIN do usuário e salva a sessão em 'odivelas_usuario_logado'
- */async function handleLogin(event) {
+
+ async function handleLogin(event) {
   event.preventDefault();
   ocultarAlerta();
 
-  const email = document.getElementById("loginEmail").value.trim();
-  const senha = document.getElementById("loginSenha").value;
+  const emailInput = document.getElementById("loginEmail").value.trim().toLowerCase();
+  const senhaInput = document.getElementById("loginSenha").value;
   const btnSubmit = document.getElementById("btnSubmitLogin");
 
-  if (!email || !senha) {
+  if (!emailInput || !senhaInput) {
     exibirAlerta("Por favor, informe seu e-mail e sua senha.");
     return;
   }
@@ -133,30 +132,29 @@ function solicitarRecuperacao() {
   setLoading(btnSubmit, true, "Entrando...");
 
   try {
-    // 1. Tenta autenticar diretamente no Supabase Auth
+    // 1. Login no Supabase Auth
     const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
-      email: email,
-      password: senha
+      email: emailInput,
+      password: senhaInput
     });
 
     if (authError) {
-      // Se falhar no Supabase, exibe mensagem amigável
       throw new Error("E-mail ou senha incorretos.");
     }
 
     const user = authData.user;
+    const userEmail = user.email ? user.email.toLowerCase().trim() : emailInput;
 
-    // 2. Busca o perfil completo do usuário na tabela 'profiles'
-   // Define o perfil do usuário
+    // 2. Monta o perfil identificando se é admin
     let perfilUsuario = {
       id: user.id,
-      email: user.email.toLowerCase().trim(),
-      nome: user.user_metadata?.nome || 'Administrador',
+      email: userEmail,
+      nome: userEmail === 'admin@odivelas.com' ? 'Administrador' : (user.user_metadata?.nome || 'Cliente'),
       whatsapp: user.user_metadata?.telefone || '',
-      tipo: (user.email.toLowerCase().trim() === 'admin@odivelas.com') ? 'admin' : 'cliente'
+      tipo: userEmail === 'admin@odivelas.com' ? 'admin' : 'cliente'
     };
 
-    // Tenta buscar da tabela profiles
+    // 3. Tenta buscar dados extras da tabela profiles
     const { data: profileDb } = await supabaseClient
       .from('profiles')
       .select('*')
@@ -169,15 +167,23 @@ function solicitarRecuperacao() {
       if (profileDb.tipo) perfilUsuario.tipo = profileDb.tipo;
     }
 
-    // Salva na chave esperada pelo verificarAcessoAdmin
-    localStorage.setItem(DB_KEYS.USUARIO_LOGADO, JSON.stringify(perfilUsuario));
+    // 4. Salva no localStorage na chave correta
+    const dbKey = (typeof DB_KEYS !== 'undefined' && DB_KEYS.USUARIO_LOGADO) 
+      ? DB_KEYS.USUARIO_LOGADO 
+      : 'odivelas_usuario_logado';
 
-    // Se for admin, redireciona para o painel do admin, senão para agendamento
-    if (perfilUsuario.tipo === 'admin' || perfilUsuario.email === 'admin@odivelas.com') {
-      window.location.href = 'admin.html';
-    } else {
-      window.location.href = 'agendamento.html';
-    }
+    localStorage.setItem(dbKey, JSON.stringify(perfilUsuario));
+
+    exibirAlerta("Login realizado com sucesso! Redirecionando...", "sucesso");
+
+    // 5. Redirecionamento por tipo de conta
+    setTimeout(() => {
+      if (perfilUsuario.tipo === 'admin' || perfilUsuario.email === 'admin@odivelas.com') {
+        window.location.href = 'admin.html';
+      } else {
+        window.location.href = 'agendamento.html';
+      }
+    }, 1000);
 
   } catch (error) {
     exibirAlerta(error.message || "Erro ao realizar login. Tente novamente.");
