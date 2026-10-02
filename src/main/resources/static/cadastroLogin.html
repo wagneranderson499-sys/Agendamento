@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acesso - Odivelas Barbearia</title>
+  
+  <!-- Fontes Google & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            title: ['"Cinzel"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #0a0a0c; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #dc2626; }
+
+    .text-gradient-red {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .text-gradient-gold {
+      background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-zinc-800/80 px-4 md:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="home.html" class="flex items-center gap-3 group">
+        <img src="barbearia (1).png" alt="Odivelas Barbearia" class="w-10 h-10 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50 group-hover:scale-105 transition duration-300">
+        <div class="flex flex-col">
+          <span class="font-title font-black text-lg md:text-xl tracking-wider text-white uppercase leading-none">
+            ODIVELAS
+          </span>
+          <span class="font-title text-[10px] md:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase leading-tight">
+            BARBEARIA
+          </span>
+        </div>
+      </a>
+
+      <a href="home.html"
+        class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition text-zinc-300 font-bold uppercase tracking-wider text-xs px-4 py-2.5 rounded-xl flex items-center gap-2">
+        <i class="fa-solid fa-arrow-left text-xs"></i>
+        <span>Voltar</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 flex items-center justify-center p-4 py-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black">
+    <div class="w-full max-w-md bg-zinc-900/90 border border-zinc-800 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black p-6 md:p-8 relative overflow-hidden">
+      
+      <div class="absolute -top-12 -right-12 w-32 h-32 bg-red-600/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-amber-500/10 rounded-full blur-2xl pointer-events-none"></div>
+
+      <!-- Alertas de Feedback -->
+      <div id="alertBox" class="hidden mb-6 p-4 rounded-xl text-xs font-semibold border transition-all"></div>
+
+      <!-- ==================== FORMULÁRIO 1: LOGIN ==================== -->
+      <div id="cardLogin" class="space-y-6">
+        <div class="text-center">
+          <span class="border border-yellow-500/30 text-yellow-500 text-[10px] uppercase tracking-[3px] px-3 py-1 rounded-full bg-yellow-500/5 inline-block mb-3 font-semibold">
+            ✦ Bem-vindo de volta
+          </span>
+          <h2 class="font-title text-2xl md:text-3xl font-black uppercase leading-tight">
+            ENTRAR NA <span class="text-gradient-red block">CONTA</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-2">Acesse sua conta para agendar e gerenciar horários.</p>
+        </div>
+
+        <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4" novalidate>
+          <div>
+            <label for="loginEmail" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">E-mail</label>
+            <div class="relative">
+              <i class="fa-regular fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="email" id="loginEmail" required placeholder="seu@email.com"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="loginSenha" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">Senha</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="password" id="loginSenha" required placeholder="••••••••"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-10 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+              <button type="button" onclick="toggleSenha('loginSenha', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="flex justify-end">
+            <a href="#" onclick="solicitarRecuperacao()" class="text-xs text-yellow-500 hover:text-yellow-400 transition hover:underline">Esqueceu a senha?</a>
+          </div>
+
+          <button type="submit" id="btnSubmitLogin"
+            class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 transition-all duration-300 text-white py-3.5 rounded-xl shadow-lg shadow-red-950/60 flex items-center justify-center gap-2">
+            <span class="font-title font-black uppercase tracking-wider text-sm">Entrar</span>
+            <i class="fa-solid fa-right-to-bracket text-sm"></i>
+          </button>
+        </form>
+
+        <div class="text-center border-t border-zinc-800/80 pt-4 text-xs text-zinc-400">
+          Ainda não tem uma conta? 
+          <button onclick="mudarTela('cadastro')" class="font-title font-black text-yellow-500 uppercase tracking-wider hover:underline ml-1">Criar conta</button>
+        </div>
+      </div>
+
+      <!-- ==================== FORMULÁRIO 2: CADASTRO ==================== -->
+      <div id="cardCadastro" class="space-y-6 hidden">
+        <div class="text-center">
+          <span class="border border-red-500/30 text-red-500 text-[10px] uppercase tracking-[3px] px-3 py-1 rounded-full bg-red-500/5 inline-block mb-3 font-semibold">
+            ✦ Novo Cliente
+          </span>
+          <h2 class="font-title text-2xl md:text-3xl font-black uppercase leading-tight">
+            CRIAR SUA <span class="text-gradient-gold block">CONTA</span>
+          </h2>
+          <p class="text-xs text-zinc-400 mt-2">Cadastre-se para garantir seus horários rapidamente.</p>
+        </div>
+
+        <form id="formCadastro" onsubmit="handleCadastro(event)" class="space-y-4" novalidate>
+          <div>
+            <label for="cadNome" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">Nome Completo</label>
+            <div class="relative">
+              <i class="fa-regular fa-user absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="text" id="cadNome" required placeholder="Seu nome completo"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="cadWhatsapp" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">WhatsApp</label>
+            <div class="relative">
+              <i class="fa-brands fa-whatsapp absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="tel" id="cadWhatsapp" maxlength="15" required placeholder="(91) 9XXXX-XXXX" oninput="aplicarMascaraTelefone(this)"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="cadEmail" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">E-mail</label>
+            <div class="relative">
+              <i class="fa-regular fa-envelope absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="email" id="cadEmail" required placeholder="seu@email.com"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-4 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+            </div>
+          </div>
+
+          <div>
+            <label for="cadSenha" class="block text-xs font-bold uppercase tracking-widest text-zinc-400 mb-1.5">Senha Forte (mínimo 6 caracteres)</label>
+            <div class="relative">
+              <i class="fa-solid fa-lock absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm"></i>
+              <input type="password" id="cadSenha" required placeholder="••••••••"
+                class="w-full bg-zinc-950 border border-zinc-800 rounded-xl pl-10 pr-10 py-3 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-red-600 transition">
+              <button type="button" onclick="toggleSenha('cadSenha', this)" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSubmitCadastro"
+            class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 transition-all duration-300 text-white py-3.5 rounded-xl shadow-lg shadow-red-950/60 flex items-center justify-center gap-2">
+            <span class="font-title font-black uppercase tracking-wider text-sm">Criar Conta</span>
+            
+          </button>
+        </form>
+
+        <div class="text-center border-t border-zinc-800/80 pt-4 text-xs text-zinc-400">
+          Já tem uma conta? 
+          <button onclick="mudarTela('login')" class="font-title font-black text-yellow-500 uppercase tracking-wider hover:underline ml-1">Fazer Login</button>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="border-t border-zinc-800/80 py-4 text-center text-zinc-500 text-xs bg-black">
+    © 2026 Odivelas Barbearia — Todos os direitos reservados.
+  </footer>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<!-- 2. Arquivo de Conexão com suas chaves -->
+<script src="supabase-client.js"></script>
+
+
+  <script src="cadastroLogin.js"></script>
+</body>
+</html>

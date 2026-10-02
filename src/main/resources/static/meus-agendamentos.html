@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-br" class="scroll-smooth">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Minha Conta & Agendamentos - Odivelas Barbearia</title>
+
+  <!-- Google Fonts & Font Awesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            title: ['"Cinzel"', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Otimizações de scroll e toque mobile */
+    body {
+      -webkit-tap-highlight-color: transparent;
+      padding-top: env(safe-area-inset-top);
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: #0a0a0c; }
+    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+
+    .text-gradient-red {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+  </style>
+</head>
+
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white pb-20 md:pb-0">
+
+  <!-- Header: Meus Agendamentos -->
+  <header class="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-zinc-800/80 px-4 md:px-8 py-3.5">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      
+      <!-- Logo Oficial -->
+      <a href="agendamento.html" class="flex items-center gap-3 group">
+        <img src="barbearia (1).png" alt="Odivelas Barbearia" class="w-10 h-10 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50 group-hover:scale-105 transition duration-300">
+        <div class="flex flex-col">
+          <span class="font-title font-black text-lg md:text-xl tracking-wider text-white uppercase leading-none">
+            ODIVELAS
+          </span>
+          <span class="font-title text-[10px] md:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase leading-tight">
+            BARBEARIA
+          </span>
+        </div>
+      </a>
+
+      <!-- Ações: Novo Agendamento + Sair -->
+      <div class="flex items-center gap-3">
+        <!-- Botão para fazer um novo agendamento -->
+        <a href="agendamento.html" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-md">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Novo Agendamento</span>
+        </a>
+
+        <!-- Botão Voltar para Agendar -->
+        <a href="agendamento.html" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold uppercase tracking-wider text-xs px-4 py-2 rounded-xl flex items-center gap-2 transition">
+          <i class="fa-solid fa-arrow-left text-xs text-yellow-500"></i>
+          <span>Voltar</span>
+        </a>
+
+        <!-- Botão Sair -->
+        <button onclick="fazerLogout()" title="Sair da Conta" class="bg-zinc-900 hover:bg-red-950/50 border border-zinc-800 hover:border-red-900/60 text-zinc-400 hover:text-red-400 p-2 rounded-xl transition">
+          <i class="fa-solid fa-right-from-bracket text-xs"></i>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 md:py-10">
+
+    <!-- Card de Perfil do Usuário com foto customizada -->
+    <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-5 md:p-6 mb-6 shadow-xl relative overflow-hidden">
+      <div class="flex flex-col sm:flex-row items-center gap-5">
+        
+        <!-- Upload de Foto de Perfil -->
+        <div class="relative group">
+          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-yellow-500/80 bg-zinc-950 flex items-center justify-center shadow-lg">
+            <img id="avatarImg" src="" alt="Foto de Perfil" class="w-full h-full object-cover hidden">
+            <i id="avatarFallback" class="fa-solid fa-user text-3xl text-zinc-600"></i>
+          </div>
+
+          <label for="inputFotoPerfil" class="absolute bottom-0 right-0 bg-yellow-500 hover:bg-yellow-400 text-black p-2 rounded-full cursor-pointer shadow-md transition active:scale-90" title="Alterar Foto">
+            <i class="fa-solid fa-camera text-xs"></i>
+          </label>
+          <input type="file" id="inputFotoPerfil" accept="image/*" class="hidden" onchange="atualizarFotoPerfil(event)">
+        </div>
+
+        <!-- Info do Usuário -->
+        <div class="text-center sm:text-left flex-1">
+          <h2 id="exibicaoNome" class="font-title text-xl md:text-2xl font-black uppercase text-white tracking-wide">
+            Carregando...
+          </h2>
+          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-1.5 text-xs text-zinc-400">
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-phone text-yellow-500 text-[10px]"></i> <span id="exibicaoTelefone">--</span></span>
+            <span class="flex items-center gap-1.5"><i class="fa-solid fa-envelope text-yellow-500 text-[10px]"></i> <span id="exibicaoEmail">--</span></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Navegação por Abas (Tabs) -->
+    <div class="flex border-b border-zinc-800 mb-6">
+      <button id="tabBtnAgendamentos" onclick="alternarAba('agendamentos')" 
+        class="flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-red-600 text-white flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-calendar-check text-red-500"></i>
+        <span>Agendamentos</span>
+      </button>
+
+      <button id="tabBtnPerfil" onclick="alternarAba('perfil')" 
+        class="flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition">
+        <i class="fa-solid fa-gear text-zinc-500"></i>
+        <span>Meus Dados</span>
+      </button>
+    </div>
+
+    <!-- Conteúdo da Aba 1: Lista de Agendamentos -->
+    <div id="abaAgendamentos" class="space-y-4">
+      <div id="listaAgendamentos" class="space-y-4">
+        <!-- Renderizado dinamicamente via JS -->
+      </div>
+    </div>
+
+    <!-- Conteúdo da Aba 2: Edição dos Dados Pessoais -->
+    <div id="abaPerfil" class="hidden">
+      <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-5 md:p-6 shadow-xl">
+        <h3 class="font-title text-base font-bold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-user-gear text-yellow-500"></i> Atualizar Informações
+        </h3>
+
+        <form id="formPerfil" onsubmit="salvarPerfil(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Nome Completo</label>
+            <input type="text" id="campoNome" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition">
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">WhatsApp / Telefone</label>
+              <input type="tel" id="campoTelefone" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition" placeholder="(91) 98579-3959">
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">E-mail</label>
+              <input type="email" id="campoEmail" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold uppercase tracking-wider py-3.5 rounded-xl transition text-xs flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-yellow-500/10">
+            <i class="fa-solid fa-floppy-disk"></i>
+            <span>Salvar Alterações</span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Rodapé Otimizado -->
+  <footer class="bg-black border-t border-zinc-800/80 py-6 text-center text-zinc-500 text-xs">
+    <p>© 2026 Odivelas Barbearia — Todos os direitos reservados.</p>
+  </footer>
+
+  <!-- Script Embutido Unificado -->
+  <script>
+    const DB_KEY_SESSAO = 'odivelas_usuario_logado';
+    const DB_KEY_AGENDAMENTOS = 'odivelas_agendamentos';
+    const DB_KEY_HISTORICO = 'odivelas_historico';
+
+    document.addEventListener('DOMContentLoaded', () => {
+      carregarDadosUsuario();
+      renderizarAgendamentos();
+    });
+
+    // 1. Alternar entre Abas
+    function alternarAba(aba) {
+      const btnAgendamentos = document.getElementById('tabBtnAgendamentos');
+      const btnPerfil = document.getElementById('tabBtnPerfil');
+      const abaAgendamentos = document.getElementById('abaAgendamentos');
+      const abaPerfil = document.getElementById('abaPerfil');
+
+      if (aba === 'agendamentos') {
+        abaAgendamentos.classList.remove('hidden');
+        abaPerfil.classList.add('hidden');
+
+        btnAgendamentos.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-red-600 text-white flex items-center justify-center gap-2 transition';
+        btnPerfil.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition';
+      } else {
+        abaAgendamentos.classList.add('hidden');
+        abaPerfil.classList.remove('hidden');
+
+        btnPerfil.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-yellow-500 text-white flex items-center justify-center gap-2 transition';
+        btnAgendamentos.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition';
+      }
+    }
+
+    // 2. Carregar e Atualizar Perfil
+    function carregarDadosUsuario() {
+      const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {
+        nome: 'Cliente',
+        nomeCompleto: 'Cliente',
+        telefone: '(91) 98579-3959',
+        email: 'cliente@odivelas.com',
+        foto: ''
+      };
+
+      const nomeFinal = usuario.nomeCompleto || usuario.nome || usuario.clienteNome || 'Cliente';
+      const telefoneFinal = usuario.telefone || usuario.whatsapp || '(91) 98579-3959';
+      const emailFinal = usuario.email || 'cliente@odivelas.com';
+
+      document.getElementById('exibicaoNome').innerText = nomeFinal;
+      document.getElementById('exibicaoTelefone').innerText = telefoneFinal;
+      document.getElementById('exibicaoEmail').innerText = emailFinal;
+
+      document.getElementById('campoNome').value = nomeFinal;
+      document.getElementById('campoTelefone').value = telefoneFinal;
+      document.getElementById('campoEmail').value = emailFinal;
+
+      // Foto Avatar
+      const avatarImg = document.getElementById('avatarImg');
+      const avatarFallback = document.getElementById('avatarFallback');
+
+      if (usuario.foto) {
+        avatarImg.src = usuario.foto;
+        avatarImg.classList.remove('hidden');
+        avatarFallback.classList.add('hidden');
+      } else {
+        avatarImg.classList.add('hidden');
+        avatarFallback.classList.remove('hidden');
+      }
+    }
+
+    function atualizarFotoPerfil(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const fotoBase64 = e.target.result;
+        
+        const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {};
+        usuario.foto = fotoBase64;
+        localStorage.setItem(DB_KEY_SESSAO, JSON.stringify(usuario));
+
+        carregarDadosUsuario();
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function salvarPerfil(event) {
+      event.preventDefault();
+      const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {};
+
+      const novoNome = document.getElementById('campoNome').value;
+      const novoTel = document.getElementById('campoTelefone').value;
+      const novoEmail = document.getElementById('campoEmail').value;
+
+      usuario.nome = novoNome;
+      usuario.nomeCompleto = novoNome;
+      usuario.telefone = novoTel;
+      usuario.whatsapp = novoTel;
+      usuario.email = novoEmail;
+
+      localStorage.setItem(DB_KEY_SESSAO, JSON.stringify(usuario));
+      carregarDadosUsuario();
+      alert('Seus dados foram atualizados com sucesso!');
+    }
+
+    // 3. Renderizar Agendamentos do Usuário
+    function renderizarAgendamentos() {
+      const container = document.getElementById('listaAgendamentos');
+      const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {};
+      
+      const agendamentosAtivos = JSON.parse(localStorage.getItem(DB_KEY_AGENDAMENTOS)) || [];
+      const historicoConcluido = JSON.parse(localStorage.getItem(DB_KEY_HISTORICO)) || [];
+
+      // Junta agendamentos pendentes com histórico concluído pelo Admin
+      const todos = [...agendamentosAtivos, ...historicoConcluido];
+
+      // Filtra os agendamentos do cliente logado
+      let meusAgendamentos = todos.filter(item => {
+        if (!usuario.email && !usuario.id) return true; // Fallback se for convidado
+        return (
+          (item.clienteEmail && item.clienteEmail === usuario.email) ||
+          (item.clienteId && item.clienteId === usuario.id) ||
+          (item.clienteNome && item.clienteNome === (usuario.nomeCompleto || usuario.nome))
+        );
+      });
+
+      // Se o filtro zerar mas houverem registros salvos, mostra os recentes
+      if (meusAgendamentos.length === 0 && todos.length > 0) {
+        meusAgendamentos = todos;
+      }
+
+      if (meusAgendamentos.length === 0) {
+        container.innerHTML = `
+          <div class="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-8 text-center my-6 space-y-3">
+            <i class="fa-regular fa-calendar-xmark text-4xl text-zinc-600"></i>
+            <p class="text-zinc-300 font-bold text-sm">Nenhum agendamento encontrado.</p>
+            <p class="text-zinc-500 text-xs">Reserve seu horário de forma rápida e prática!</p>
+            <a href="agendamento.html" class="inline-block bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-red-950/40">
+              Agendar Agora
+            </a>
+          </div>
+        `;
+        return;
+      }
+
+      container.innerHTML = meusAgendamentos.reverse().map(item => {
+        const partesData = item.data ? item.data.split('-') : [];
+        const dataFormatada = partesData.length === 3 ? `${partesData[2]}/${partesData[1]}/${partesData[0]}` : (item.data || 'Hoje');
+        const precoFormatado = Number(item.preco || 0).toFixed(2).replace('.', ',');
+        const horaExibicao = item.horario || item.hora || '14:00';
+
+        let statusBadge = '';
+        if (item.status === 'confirmado') {
+          statusBadge = '<span class="bg-green-500/10 text-green-400 border border-green-500/30 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fa-solid fa-circle-check text-[8px]"></i>Confirmado</span>';
+        } else if (item.status === 'concluido') {
+          statusBadge = '<span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fa-solid fa-check-double text-[8px]"></i>Concluído</span>';
+        } else {
+          statusBadge = '<span class="bg-red-500/10 text-red-400 border border-red-500/30 text-[10px] uppercase font-bold px-2.5 py-1 rounded-full flex items-center gap-1"><i class="fa-solid fa-ban text-[8px]"></i>Cancelado</span>';
+        }
+
+        return `
+          <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-4 md:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 transition hover:border-zinc-700 shadow-lg">
+            <div class="space-y-1.5">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-white text-base">${item.servico || 'Corte'}</span>
+                ${statusBadge}
+              </div>
+
+              <div class="flex flex-wrap items-center gap-3 text-xs text-zinc-400 pt-1">
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-calendar text-yellow-500"></i> ${dataFormatada}</span>
+                <span class="flex items-center gap-1.5"><i class="fa-regular fa-clock text-yellow-500"></i> ${horaExibicao}</span>
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-user-scissors text-yellow-500"></i> ${item.barbeiro || 'HS Barbeiro'}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between sm:justify-end w-full sm:w-auto border-t sm:border-t-0 border-zinc-800 pt-3 sm:pt-0 gap-4">
+              <span class="text-yellow-500 font-bold text-base">R$ ${precoFormatado}</span>
+              ${item.status === 'confirmado' ? `
+                <button onclick="cancelarAgendamento('${item.id}')" class="text-xs text-red-400 hover:text-white bg-red-950/40 hover:bg-red-600 border border-red-800/50 px-3.5 py-1.5 rounded-xl font-bold transition">
+                  Cancelar
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // 4. Cancelar Agendamento
+    function cancelarAgendamento(id) {
+      if (!confirm('Deseja realmente cancelar este agendamento?')) return;
+
+      let agendamentos = JSON.parse(localStorage.getItem(DB_KEY_AGENDAMENTOS)) || [];
+      
+      agendamentos = agendamentos.map(item => {
+        if (String(item.id) === String(id)) {
+          item.status = 'cancelado';
+        }
+        return item;
+      });
+
+      localStorage.setItem(DB_KEY_AGENDAMENTOS, JSON.stringify(agendamentos));
+      renderizarAgendamentos();
+    }
+
+    // 5. Logout
+    function fazerLogout() {
+      localStorage.removeItem(DB_KEY_SESSAO);
+      window.location.href = 'login.html';
+    }
+  </script>
+
+</body>
+</html>
