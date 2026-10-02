@@ -293,19 +293,24 @@ async function confirmarAgendamento() {
   localStorage.setItem('odivelas_agendamentos', JSON.stringify(agendamentosLocais));
 
   // 4. MENSAGEM WHATSAPP E REDIRECIONAMENTO
+ // 4. MENSAGEM WHATSAPP E REDIRECIONAMENTO
   const partesData = dataSelecionada.split('-');
   const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
   const precoFormatado = Number(servicoSelecionado.preco).toFixed(2).replace('.', ',');
 
+  // Lembre-se de definir a variável SEU_WHATSAPP_BARBEARIA no topo do seu código (com 55 + DDD)
+  // Exemplo: const SEU_WHATSAPP_BARBEARIA = "5591980000000";
+  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591985793959";
+
   const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
     `👤 *Cliente:* ${clienteAtual.nome}\n` +
     `📱 *Contato:* ${clienteAtual.telefone}\n` +
-    `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
+    `✂️️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
     `📅 *Data:* ${dataFormatada}\n` +
     `⏰ *Horário:* ${horarioSelecionado}\n` +
     `💈 *Barbeiro:* ${barbeiroSelecionado || 'Odivelas'}`;
 
-  const linkZap = `https://wa.me/${SEU_WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagemWhatsApp)}`;
+  const linkZap = `https://wa.me/${numeroBarbeiro}?text=${encodeURIComponent(mensagemWhatsApp)}`;
 
   const modal = document.getElementById('modalSucesso');
   if (modal) {
@@ -313,10 +318,14 @@ async function confirmarAgendamento() {
     modal.classList.add('flex');
   }
 
+  // Abre o WhatsApp imediatamente no clique (evita bloqueio de popup)
+  window.open(linkZap, '_blank');
+
+  // Redireciona a página atual após breve pausa
   setTimeout(() => {
-    window.open(linkZap, '_blank');
     window.location.href = 'meus-agendamentos.html';
-  }, 1800);
+  }, 1500);
+
 }
 // Busca os servicos e preços atualizados direto da tabela do Supabase
 async function obterServicosDoSupabase() {

@@ -147,13 +147,16 @@ function solicitarRecuperacao() {
     const user = authData.user;
 
     // 2. Busca o perfil completo do usuário na tabela 'profiles'
+   // Define o perfil do usuário
     let perfilUsuario = {
       id: user.id,
-      email: user.email,
-      nome: user.user_metadata?.nome || 'Cliente',
-      whatsapp: user.user_metadata?.telefone || ''
+      email: user.email.toLowerCase().trim(),
+      nome: user.user_metadata?.nome || 'Administrador',
+      whatsapp: user.user_metadata?.telefone || '',
+      tipo: (user.email.toLowerCase().trim() === 'admin@odivelas.com') ? 'admin' : 'cliente'
     };
 
+    // Tenta buscar da tabela profiles
     const { data: profileDb } = await supabaseClient
       .from('profiles')
       .select('*')
@@ -163,16 +166,18 @@ function solicitarRecuperacao() {
     if (profileDb) {
       perfilUsuario.nome = profileDb.nome || perfilUsuario.nome;
       perfilUsuario.whatsapp = profileDb.telefone || perfilUsuario.whatsapp;
+      if (profileDb.tipo) perfilUsuario.tipo = profileDb.tipo;
     }
 
-    // 3. Grava o usuário logado no localStorage para manter a compatibilidade do site
-    localStorage.setItem('odivelas_usuario_logado', JSON.stringify(perfilUsuario));
+    // Salva na chave esperada pelo verificarAcessoAdmin
+    localStorage.setItem(DB_KEYS.USUARIO_LOGADO, JSON.stringify(perfilUsuario));
 
-    exibirAlerta("Login realizado com sucesso! Redirecionando...", "sucesso");
-
-    setTimeout(() => {
+    // Se for admin, redireciona para o painel do admin, senão para agendamento
+    if (perfilUsuario.tipo === 'admin' || perfilUsuario.email === 'admin@odivelas.com') {
+      window.location.href = 'admin.html';
+    } else {
       window.location.href = 'agendamento.html';
-    }, 1000);
+    }
 
   } catch (error) {
     exibirAlerta(error.message || "Erro ao realizar login. Tente novamente.");
