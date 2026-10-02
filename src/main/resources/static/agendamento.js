@@ -293,25 +293,40 @@ async function confirmarAgendamento() {
   localStorage.setItem('odivelas_agendamentos', JSON.stringify(agendamentosLocais));
 
   // 4. MENSAGEM WHATSAPP E REDIRECIONAMENTO
- // 4. MENSAGEM WHATSAPP E REDIRECIONAMENTO
+ // 4. MENSAGEM WHATSAPP E EXIBIÇÃO DO MODAL
   const partesData = dataSelecionada.split('-');
   const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
   const precoFormatado = Number(servicoSelecionado.preco).toFixed(2).replace('.', ',');
 
-  // Lembre-se de definir a variável SEU_WHATSAPP_BARBEARIA no topo do seu código (com 55 + DDD)
-  // Exemplo: const SEU_WHATSAPP_BARBEARIA = "5591980000000";
-  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591985793959";
+  // Insira o número do WhatsApp da barbearia (55 + DDD + Número)
+  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "55919XXXXXXX";
 
   const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
     `👤 *Cliente:* ${clienteAtual.nome}\n` +
     `📱 *Contato:* ${clienteAtual.telefone}\n` +
-    `✂️️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
+    `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
     `📅 *Data:* ${dataFormatada}\n` +
     `⏰ *Horário:* ${horarioSelecionado}\n` +
     `💈 *Barbeiro:* ${barbeiroSelecionado || 'Odivelas'}`;
 
   const linkZap = `https://wa.me/${numeroBarbeiro}?text=${encodeURIComponent(mensagemWhatsApp)}`;
 
+  // Injeta o link no botão do WhatsApp no modal
+  const btnEnviarZap = document.getElementById('btnEnviarZap');
+  if (btnEnviarZap) {
+    btnEnviarZap.href = linkZap;
+  }
+
+  // Abre o modal na tela
+  const modal = document.getElementById('modalSucesso');
+  if (modal) {
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  } else {
+    // Backup para celular se o modal não for encontrado
+    window.location.href = linkZap;
+  }
+}
   const modal = document.getElementById('modalSucesso');
   if (modal) {
     modal.classList.remove('hidden');
@@ -326,7 +341,7 @@ async function confirmarAgendamento() {
     window.location.href = 'meus-agendamentos.html';
   }, 1500);
 
-}
+
 // Busca os servicos e preços atualizados direto da tabela do Supabase
 async function obterServicosDoSupabase() {
   try {
