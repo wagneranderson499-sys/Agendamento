@@ -117,8 +117,7 @@ function solicitarRecuperacao() {
 
 /**
  * Processa o LOGIN do usuário e salva a sessão em 'odivelas_usuario_logado'
- */
-async function handleLogin(event) {
+ */async function handleLogin(event) {
   event.preventDefault();
   ocultarAlerta();
 
@@ -126,67 +125,57 @@ async function handleLogin(event) {
   const senha = document.getElementById("loginSenha").value;
   const btnSubmit = document.getElementById("btnSubmitLogin");
 
-  if (!validarEmail(email)) {
-    exibirAlerta("Por favor, informe um e-mail válido.");
-    return;
-  }
-
-  if (!senha || senha.length < 4) {
-    exibirAlerta("Por favor, preencha sua senha corretamente.");
+  if (!email || !senha) {
+    exibirAlerta("Por favor, informe seu e-mail e sua senha.");
     return;
   }
 
   setLoading(btnSubmit, true, "Entrando...");
 
   try {
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    // 1. Tenta autenticar diretamente no Supabase Auth
+    const { data: authData, error: authError } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: senha
+    });
 
-    // 1. Verificação Especial: Administrador / Barbeiro
-    if (email === "admin@odivelas.com" && senha === "admin123") {
-      const adminSessao = {
-        id: "ADMIN-01",
-        nome: "Barbeiro Admin",
-        email: email,
-        telefone: "(91) 99999-9999",
-        tipo: "admin"
-      };
-      
-      localStorage.setItem("odivelas_usuario_logado", JSON.stringify(adminSessao));
-      exibirAlerta("Login de Administrador realizado!", "sucesso");
-
-      setTimeout(() => {
-        window.location.href = "admin.html";
-      }, 1000);
-      return;
-    }
-
-    // 2. Busca o usuário cadastrado no localStorage
-    const usuarios = JSON.parse(localStorage.getItem("odivelas_usuarios") || "[]");
-    const usuarioEncontrado = usuarios.find((u) => u.email === email && u.senha === senha);
-
-    if (!usuarioEncontrado) {
+    if (authError) {
+      // Se falhar no Supabase, exibe mensagem amigável
       throw new Error("E-mail ou senha incorretos.");
     }
 
-    // 3. Salva a sessão ativa com Nome, E-mail e WhatsApp para o Admin visualizar
-    const usuarioSessao = {
-      id: usuarioEncontrado.id,
-      nome: usuarioEncontrado.nome,
-      email: usuarioEncontrado.email,
-      telefone: usuarioEncontrado.whatsapp,
-      tipo: "cliente"
+    const user = authData.user;
+
+    // 2. Busca o perfil completo do usuário na tabela 'profiles'
+    let perfilUsuario = {
+      id: user.id,
+      email: user.email,
+      nome: user.user_metadata?.nome || 'Cliente',
+      whatsapp: user.user_metadata?.telefone || ''
     };
 
-    localStorage.setItem("odivelas_usuario_logado", JSON.stringify(usuarioSessao));
+    const { data: profileDb } = await supabaseClient
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
 
-    exibirAlerta(`Bem-vindo, ${usuarioEncontrado.nome}! Redirecionando...`, "sucesso");
+    if (profileDb) {
+      perfilUsuario.nome = profileDb.nome || perfilUsuario.nome;
+      perfilUsuario.whatsapp = profileDb.telefone || perfilUsuario.whatsapp;
+    }
+
+    // 3. Grava o usuário logado no localStorage para manter a compatibilidade do site
+    localStorage.setItem('odivelas_usuario_logado', JSON.stringify(perfilUsuario));
+
+    exibirAlerta("Login realizado com sucesso! Redirecionando...", "sucesso");
 
     setTimeout(() => {
-      window.location.href = "agendamento.html";
-    }, 1200);
+      window.location.href = 'agendamento.html';
+    }, 1000);
 
   } catch (error) {
-    exibirAlerta(error.message || "Falha na autenticação. Tente novamente.");
+    exibirAlerta(error.message || "Erro ao realizar login. Tente novamente.");
   } finally {
     setLoading(
       btnSubmit,
@@ -195,7 +184,6 @@ async function handleLogin(event) {
     );
   }
 }
-
 /**
  * Processa o CADASTRO salvando em 'odivelas_usuarios'
  */
