@@ -39,39 +39,55 @@ function verificarSessao() {
     elNome.textContent = usuarioLogado.nome || 'Cliente';
   }
 }
-
 /**
- * 2. Carrega e exibe os agendamentos do usuário logado
+ * 2. Carrega e exibe os agendamentos do usuário logado (Buscando do Supabase)
  */
-function carregarMeusAgendamentos() {
+async function carregarMeusAgendamentos() {
   const containerProximos = document.getElementById('containerProximosAgendamentos');
   const containerHistorico = document.getElementById('containerHistoricoAgendamentos');
 
   if (!containerProximos && !containerHistorico) return;
 
-  // Busca todos os agendamentos salvos no localStorage
-  const todosAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
-
-  // Se o usuário estiver logado com e-mail, filtra os dele. Se for recém-agendado sem e-mail, mostra os mais recentes.
   let meusAgendamentos = [];
-  if (usuarioLogado && usuarioLogado.email) {
-    meusAgendamentos = todosAgendamentos.filter(
-      a => a.clienteEmail === usuarioLogado.email || a.clienteId === usuarioLogado.id
-    );
-  } else {
-    // Caso de fallback: exibe todos os agendamentos guardados localmente
-    meusAgendamentos = todosAgendamentos;
+
+  try {
+    // 1. Busca os agendamentos do Supabase
+    let query = supabaseClient.from('agendamentos').select('*');
+
+    // Se o usuário estiver logado, filtra por email no banco
+    if (usuarioLogado && usuarioLogado.email) {
+      query = query.eq('cliente_email', usuarioLogado.email);
+    }
+
+    const { data: agendamentosDb, error } = await query
+      .order('data', { ascending: false })
+      .order('horario', { ascending: false });
+
+    if (error) {
+      console.error('Erro ao buscar do Supabase:', error.message);
+    } else if (agendamentosDb && agendamentosDb.length > 0) {
+      meusAgendamentos = agendamentosDb;
+    } else {
+      // Fallback para o localStorage se não vier nada do banco
+      meusAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
+    }
+
+  } catch (err) {
+    console.error('Erro na conexão com Supabase:', err);
+    meusAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
   }
 
-  // Obter data atual no formato YYYY-MM-DD
+  // Data atual para separar Próximos de Histórico
   const hoje = new Date().toISOString().split('T')[0];
 
+  // PRÓXIMOS: Apenas agendamentos com data de hoje/futura que estejam PENDENTES/CONFIRMADOS (não concluídos e não cancelados)
   const proximos = meusAgendamentos.filter(
-    a => a.data >= hoje && a.status !== 'cancelado'
+    a => a.data >= hoje && a.status !== 'cancelado' && a.status !== 'concluido'
   );
 
+  // HISTÓRICO: Datas passadas OU agendamentos com status 'concluido' ou 'cancelado'
   const historico = meusAgendamentos.filter(
-    a => a.data < hoje || a.status === 'cancelado'
+    a => a.data < hoje || a.status === 'cancelado' || a.status === 'concluido'
   );
 
   // Renderiza no HTML
