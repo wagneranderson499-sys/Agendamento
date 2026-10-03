@@ -78,24 +78,21 @@ function trocarAba(idAba, elementoBtn) {
     carregarGerenciadorServicos();
   }
 }
-// 2. GRADE DE HORÁRIOS ADMIN (Ajustado para coluna 'horario')
+// GRADE DE HORÁRIOS ADMIN
 async function carregarGradeHorariosAdmin(dataFiltro) {
   const container = document.getElementById('gridHorariosAdmin') || document.getElementById('gradeHorariosAdmin');
   if (!container) return;
 
-  container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 my-4';
-
-  const dataAlvo = dataFiltro || document.getElementById('adminDataFiltro')?.value || new Date().toISOString().split('T')[0];
+  const inputData = document.getElementById('adminDataFiltro');
+  const dataAlvo = dataFiltro || inputData?.value || new Date().toISOString().split('T')[0];
 
   try {
-    // 1. Busca agendamentos confirmados/pendentes
-    const { data: agendamentosDb, error: errAgend } = await supabaseClient
+    // 1. Ocupados
+    const { data: agendamentosDb } = await supabaseClient
       .from('agendamentos')
-      .select('horario, cliente_nome, servico_nome, status')
+      .select('horario, cliente_nome, status')
       .eq('data', dataAlvo)
       .neq('status', 'cancelado');
-
-    if (errAgend) console.error('Erro ao buscar agendamentos:', errAgend.message);
 
     const ocupadosMap = {};
     if (agendamentosDb) {
@@ -104,13 +101,11 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
       });
     }
 
-    // 2. Busca bloqueios na tabela 'bloqueios' usando a coluna 'horario'
-    const { data: bloqueiosDb, error: errBloq } = await supabaseClient
+    // 2. Bloqueados
+    const { data: bloqueiosDb } = await supabaseClient
       .from('bloqueios')
       .select('horario')
       .eq('data', dataAlvo);
-
-    if (errBloq) console.error('Erro ao buscar bloqueios:', errBloq.message);
 
     const bloqueadosLista = bloqueiosDb ? bloqueiosDb.map(b => b.horario) : [];
 
@@ -121,10 +116,10 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
       const estaBloqueado = bloqueadosLista.includes(horario);
 
       const div = document.createElement('div');
-      
+
       if (clienteNome) {
         // --- OCUPADO (AMARELO) ---
-        div.className = 'p-3 rounded-2xl bg-amber-500/20 border-2 border-amber-500/80 text-amber-300 flex flex-col justify-between shadow-lg shadow-amber-500/10 transition active:scale-95 min-h-[85px]';
+        div.className = 'p-3 rounded-2xl bg-amber-500/20 border-2 border-amber-500/80 text-amber-300 flex flex-col justify-between shadow-lg shadow-amber-500/10 min-h-[85px]';
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
@@ -136,27 +131,29 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
         `;
       } else if (estaBloqueado) {
         // --- BLOQUEADO (VERMELHO) ---
-        div.className = 'p-3 rounded-2xl bg-red-950/60 border-2 border-red-500/70 text-red-300 flex flex-col justify-between shadow-lg shadow-red-500/10 transition active:scale-95 min-h-[85px]';
+        div.className = 'p-3 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-300 flex flex-col justify-between shadow-lg shadow-red-500/20 transition active:scale-95 cursor-pointer min-h-[85px]';
+        div.onclick = () => alternarBloqueioHorario(dataAlvo, horario, true);
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
-            <span class="text-[10px] font-extrabold uppercase bg-red-500 text-white px-1.5 py-0.5 rounded-md">Bloqueado</span>
+            <span class="text-[10px] font-extrabold uppercase bg-red-600 text-white px-1.5 py-0.5 rounded-md shadow">Bloqueado</span>
           </div>
-          <button onclick="desbloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="mt-1 text-xs font-semibold text-red-400 hover:text-white underline text-left">
-            Desbloquear
-          </button>
+          <span class="mt-1 text-xs font-bold text-red-400 hover:text-white underline text-left">
+            Clique p/ Desbloquear
+          </span>
         `;
       } else {
         // --- LIVRE (VERDE) ---
-        div.className = 'p-3 rounded-2xl bg-emerald-950/50 border-2 border-emerald-500/70 text-emerald-300 flex flex-col justify-between shadow-lg shadow-emerald-500/10 transition active:scale-95 min-h-[85px]';
+        div.className = 'p-3 rounded-2xl bg-emerald-950/50 border-2 border-emerald-500/70 text-emerald-300 flex flex-col justify-between shadow-lg shadow-emerald-500/10 transition active:scale-95 cursor-pointer min-h-[85px]';
+        div.onclick = () => alternarBloqueioHorario(dataAlvo, horario, false);
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
             <span class="text-[10px] font-extrabold uppercase bg-emerald-500 text-black px-1.5 py-0.5 rounded-md">Livre</span>
           </div>
-          <button onclick="bloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="mt-1 text-xs font-semibold text-emerald-400 hover:text-white text-left opacity-80 hover:opacity-100">
-            + Bloquear
-          </button>
+          <span class="mt-1 text-xs font-semibold text-emerald-400 hover:text-white text-left opacity-80">
+            + Clique p/ Bloquear
+          </span>
         `;
       }
 
@@ -168,11 +165,10 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
   }
 }
 
-// LÓGICA DE BLOQUEIO / DESBLOQUEIO DE HORÁRIOS (Ajustado para coluna 'horario')
+// FUNÇÃO DE ALTERNAR BLOQUEIO
 async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
-      // Deleta da tabela 'bloqueios' usando a coluna 'horario'
       const { error } = await supabaseClient
         .from('bloqueios')
         .delete()
@@ -180,32 +176,18 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
         .eq('horario', horario);
 
       if (error) {
-        console.error("Erro ao desbloquear no Supabase:", error.message);
         alert("Erro ao desbloquear: " + error.message);
         return;
       }
-
-      // Atualiza o localStorage
-      let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.horario === horario || b.hr === horario)));
-      localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
-
     } else {
-      // Insere na tabela 'bloqueios' gravando exatamente na coluna 'horario'
       const { error } = await supabaseClient
         .from('bloqueios')
         .insert([{ data: data, horario: horario }]);
 
       if (error) {
-        console.error("Erro ao bloquear no Supabase:", error.message);
-        alert("Erro ao bloquear no banco de dados: " + error.message);
+        alert("Erro ao bloquear no banco: " + error.message);
         return;
       }
-
-      // Atualiza o localStorage
-      let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais.push({ data, horario });
-      localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
     }
 
     // Recarrega a grade e os cards do topo imediatamente
@@ -213,7 +195,7 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
     await atualizarIndicadoresTopo();
 
   } catch (err) {
-    console.error("Erro inesperado ao alternar bloqueio:", err);
+    console.error("Erro ao alternar bloqueio:", err);
   }
 }
 // 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO
