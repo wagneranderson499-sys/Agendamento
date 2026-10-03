@@ -85,10 +85,13 @@ function trocarAba(idAba, elementoBtn) {
   const container = document.getElementById('gridHorariosAdmin') || document.getElementById('gradeHorariosAdmin');
   if (!container) return;
 
+  // Garante a classe responsiva de Grid no container pai
+  container.className = 'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2 sm:gap-3 my-4';
+
   const dataAlvo = dataFiltro || document.getElementById('dataFiltroAdmin')?.value || new Date().toISOString().split('T')[0];
 
   try {
-    // 1. Busca APENAS agendamentos CONFIRMADOS no Supabase para esta data
+    // 1. Busca APENAS agendamentos CONFIRMADOS no Supabase
     const { data: agendamentosDb, error } = await supabaseClient
       .from('agendamentos')
       .select('horario, cliente_nome, servico_nome')
@@ -97,11 +100,10 @@ function trocarAba(idAba, elementoBtn) {
 
     if (error) console.error('Erro ao buscar grade do Supabase:', error.message);
 
-    // Mapeia os horários ocupados vindos do banco
     const ocupadosMap = {};
     if (agendamentosDb) {
       agendamentosDb.forEach(a => {
-        ocupadosMap[a.horario] = a.cliente_nome || 'Agendado';
+        ocupadosMap[a.horario] = a.cliente_nome || 'Ocupado';
       });
     }
 
@@ -115,7 +117,7 @@ function trocarAba(idAba, elementoBtn) {
 
     container.innerHTML = '';
 
-    // 3. Monta os botões na tela do Admin (09:00 - 12:00 e 14:00 - 21:00)
+    // 3. Renderiza os cartões coloridos e responsivos
     HORARIOS_PADRAO.forEach(horario => {
       const clienteNome = ocupadosMap[horario];
       const estaBloqueado = bloqueadosLista.includes(horario);
@@ -123,28 +125,40 @@ function trocarAba(idAba, elementoBtn) {
       const div = document.createElement('div');
       
       if (clienteNome) {
-        // Horário Ocupado por um Cliente
-        div.className = 'p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex flex-col justify-between items-start';
+        // --- OCUPADO (BOTÃO AMARELO/LARANJA INTEGRAL) ---
+        div.className = 'p-3 rounded-2xl bg-amber-500/20 border-2 border-amber-500/80 text-amber-300 flex flex-col justify-between shadow-lg shadow-amber-500/10 transition active:scale-95 min-h-[85px]';
         div.innerHTML = `
-          <span class="font-black text-sm">${horario}</span>
-          <span class="text-xs font-bold text-white truncate max-w-full">${clienteNome}</span>
-          <span class="text-[10px] text-amber-400 uppercase tracking-wider font-semibold">Ocupado</span>
+          <div class="flex justify-between items-center w-full">
+            <span class="font-black text-base sm:text-lg text-white">${horario}</span>
+            <span class="text-[10px] font-extrabold uppercase bg-amber-500 text-black px-1.5 py-0.5 rounded-md">Ocupado</span>
+          </div>
+          <div class="mt-1 w-full">
+            <p class="text-xs font-bold text-amber-200 truncate w-full" title="${clienteNome}">${clienteNome}</p>
+          </div>
         `;
       } else if (estaBloqueado) {
-        // Horário Bloqueado Manualmente
-        div.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex flex-col justify-between items-start';
+        // --- BLOQUEADO (BOTÃO VERMELHO INTEGRAL) ---
+        div.className = 'p-3 rounded-2xl bg-red-950/60 border-2 border-red-500/70 text-red-300 flex flex-col justify-between shadow-lg shadow-red-500/10 transition active:scale-95 min-h-[85px]';
         div.innerHTML = `
-          <span class="font-black text-sm">${horario}</span>
-          <span class="text-xs text-red-300">Bloqueado</span>
-          <button onclick="desbloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="text-[10px] underline hover:text-white mt-1">Desbloquear</button>
+          <div class="flex justify-between items-center w-full">
+            <span class="font-black text-base sm:text-lg text-white">${horario}</span>
+            <span class="text-[10px] font-extrabold uppercase bg-red-500 text-white px-1.5 py-0.5 rounded-md">Bloqueado</span>
+          </div>
+          <button onclick="desbloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="mt-1 text-xs font-semibold text-red-400 hover:text-white underline text-left">
+            Desbloquear
+          </button>
         `;
       } else {
-        // Horário Livre
-        div.className = 'p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 flex flex-col justify-between items-start hover:border-zinc-700 transition';
+        // --- LIVRE (BOTÃO VERDE INTEGRAL) ---
+        div.className = 'p-3 rounded-2xl bg-emerald-950/50 border-2 border-emerald-500/70 text-emerald-300 flex flex-col justify-between shadow-lg shadow-emerald-500/10 transition active:scale-95 min-h-[85px]';
         div.innerHTML = `
-          <span class="font-black text-sm text-zinc-200">${horario}</span>
-          <span class="text-xs text-emerald-400 font-medium">Livre</span>
-          <button onclick="bloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="text-[10px] text-zinc-500 hover:text-red-400 mt-1">Bloquear</button>
+          <div class="flex justify-between items-center w-full">
+            <span class="font-black text-base sm:text-lg text-white">${horario}</span>
+            <span class="text-[10px] font-extrabold uppercase bg-emerald-500 text-black px-1.5 py-0.5 rounded-md">Livre</span>
+          </div>
+          <button onclick="bloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="mt-1 text-xs font-semibold text-emerald-400 hover:text-white text-left opacity-80 hover:opacity-100">
+            + Bloquear
+          </button>
         `;
       }
 
@@ -152,7 +166,7 @@ function trocarAba(idAba, elementoBtn) {
     });
 
   } catch (err) {
-    console.error('Erro ao montar grade admin:', err);
+    console.error('Erro ao carregar grade admin:', err);
   }
 }
 async function alternarBloqueioHorario(data, horario, jaBloqueado) {
@@ -261,7 +275,6 @@ async function carregarTabelaAgendamentosAdmin() {
     tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-400">Erro ao carregar agendamentos.</td></tr>`;
   }
 }
-
 async function concluirCorte(idAgendamento) {
   try {
     // 1. Atualiza o status no Supabase
@@ -292,15 +305,19 @@ async function concluirCorte(idAgendamento) {
     }
 
     alert('Corte concluído e adicionado ao faturamento/histórico!');
+    
+    // 3. RECARREGA TABELA, GRADE E INDICADORES DO TOPO
     await carregarTabelaAgendamentosAdmin();
     if (typeof carregarGradeHorariosAdmin === 'function') {
       await carregarGradeHorariosAdmin();
+    }
+    if (typeof atualizarIndicadoresTopo === 'function') {
+      await atualizarIndicadoresTopo(); // <-- Recarrega os cards de Faturamento e Cortes no topo
     }
   } catch (err) {
     console.error('Erro ao concluir corte:', err);
   }
 }
-
 async function cancelarAgendamentoAdmin(idAgendamento) {
   if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
 
@@ -471,30 +488,64 @@ async function salvarPrecoServico(idx, nomeServico) {
   }
 }
 
-// 5. CARDS DE INDICADORES NO TOPO
-function atualizarIndicadoresTopo() {
-  const dataHoje = new Date().toISOString().split('T')[0];
-  const agendamentos = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
-  const historico = JSON.parse(localStorage.getItem(DB_KEYS.HISTORICO) || '[]');
-  const bloqueios = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
+// 5. CARDS DE INDICADORES NO TOPO (Integrado com Supabase)
+async function atualizarIndicadoresTopo() {
+  const dataHoje = document.getElementById('adminDataFiltro')?.value || new Date().toISOString().split('T')[0];
 
-  const agendadosHoje = agendamentos.filter(a => a.data === dataHoje && a.status !== 'cancelado');
-  const concluidosHoje = historico.filter(h => h.data === dataHoje || (h.concluidoEm && h.concluidoEm.startsWith(dataHoje)));
-  const bloqueadosHoje = bloqueios.filter(b => b.data === dataHoje);
+  try {
+    // 1. Busca agendamentos do dia no Supabase
+    const { data: agendamentos, error: errAgend } = await supabaseClient
+      .from('agendamentos')
+      .select('*')
+      .eq('data', dataHoje);
 
-  const faturamentoTotal = concluidosHoje.reduce((acc, curr) => acc + Number(curr.preco || 0), 0);
+    if (errAgend) throw errAgend;
 
-  const elQtd = document.getElementById('qtdAgendamentosHoje');
-  const elFat = document.getElementById('faturamentoHoje');
-  const elLivres = document.getElementById('horariosLivres');
-  const elBloq = document.getElementById('horariosBloqueados');
+    // 2. Busca horários bloqueados no dia no Supabase
+    const { data: bloqueios, error: errBloq } = await supabaseClient
+      .from('bloqueios')
+      .select('*')
+      .eq('data', dataHoje);
 
-  if (elQtd) elQtd.innerText = agendadosHoje.length + concluidosHoje.length;
-  if (elFat) elFat.innerText = `R$ ${faturamentoTotal.toFixed(2).replace('.', ',')}`;
-  if (elBloq) elBloq.innerText = bloqueadosHoje.length;
-  if (elLivres) elLivres.innerText = HORARIOS_PADRAO.length - (agendadosHoje.length + bloqueadosHoje.length);
+    if (errBloq) throw errBloq;
+
+    const listaAgendamentos = agendamentos || [];
+    const listaBloqueios = bloqueios || [];
+
+    // Filtra cortes confirmados/concluídos e cancelados
+    const cortesAtivos = listaAgendamentos.filter(a => a.status !== 'cancelado');
+    const cortesConcluidos = listaAgendamentos.filter(a => a.status === 'concluido' || a.status === 'confirmado');
+
+    // Soma o faturamento considerando o campo 'valor'
+    const faturamentoTotal = cortesConcluidos.reduce((acc, curr) => {
+      const precoLimpo = String(curr.valor || 0).replace('R$', '').replace(',', '.').trim();
+      return acc + (parseFloat(precoLimpo) || 0);
+    }, 0);
+
+    // Atualiza os elementos na tela
+    const elQtd = document.getElementById('qtdAgendamentosHoje');
+    const elFat = document.getElementById('faturamentoHoje');
+    const elLivres = document.getElementById('horariosLivres');
+    const elBloq = document.getElementById('horariosBloqueados');
+
+    if (elQtd) elQtd.innerText = cortesAtivos.length;
+    if (elFat) {
+      elFat.innerText = faturamentoTotal.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      });
+    }
+    if (elBloq) elBloq.innerText = listaBloqueios.length;
+    if (elLivres) {
+      const totalHorariosPadrao = typeof HORARIOS_PADRAO !== 'undefined' ? HORARIOS_PADRAO.length : 12;
+      const ocupadosOuBloqueados = cortesAtivos.length + listaBloqueios.length;
+      elLivres.innerText = Math.max(0, totalHorariosPadrao - ocupadosOuBloqueados);
+    }
+
+  } catch (err) {
+    console.error('Erro ao atualizar indicadores do topo:', err);
+  }
 }
-
 function fazerLogoutAdmin() {
   localStorage.removeItem(DB_KEYS.USUARIO_LOGADO);
   window.location.href = 'login.html';
