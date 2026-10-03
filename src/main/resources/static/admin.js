@@ -78,8 +78,7 @@ function trocarAba(idAba, elementoBtn) {
     carregarGerenciadorServicos();
   }
 }
-
-// 2. GRADE DE HORÁRIOS ADMIN (LIVRE / OCUPADO / BLOQUEADO)
+// 2. GRADE DE HORÁRIOS ADMIN (Ajustado para coluna 'horario')
 async function carregarGradeHorariosAdmin(dataFiltro) {
   const container = document.getElementById('gridHorariosAdmin') || document.getElementById('gradeHorariosAdmin');
   if (!container) return;
@@ -89,7 +88,7 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
   const dataAlvo = dataFiltro || document.getElementById('adminDataFiltro')?.value || new Date().toISOString().split('T')[0];
 
   try {
-    // Busca agendamentos confirmados/pendentes
+    // 1. Busca agendamentos confirmados/pendentes
     const { data: agendamentosDb, error: errAgend } = await supabaseClient
       .from('agendamentos')
       .select('horario, cliente_nome, servico_nome, status')
@@ -105,15 +104,15 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
       });
     }
 
-    // Busca bloqueios na tabela bloqueios usando a coluna hr
+    // 2. Busca bloqueios na tabela 'bloqueios' usando a coluna 'horario'
     const { data: bloqueiosDb, error: errBloq } = await supabaseClient
       .from('bloqueios')
-      .select('hr')
+      .select('horario')
       .eq('data', dataAlvo);
 
     if (errBloq) console.error('Erro ao buscar bloqueios:', errBloq.message);
 
-    const bloqueadosLista = bloqueiosDb ? bloqueiosDb.map(b => b.hr) : [];
+    const bloqueadosLista = bloqueiosDb ? bloqueiosDb.map(b => b.horario) : [];
 
     container.innerHTML = '';
 
@@ -169,49 +168,54 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
   }
 }
 
-// LÓGICA DE BLOQUEIO / DESBLOQUEIO DE HORÁRIOS
+// LÓGICA DE BLOQUEIO / DESBLOQUEIO DE HORÁRIOS (Ajustado para coluna 'horario')
 async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
+      // Deleta da tabela 'bloqueios' usando a coluna 'horario'
       const { error } = await supabaseClient
         .from('bloqueios')
         .delete()
         .eq('data', data)
-        .eq('hr', horario);
+        .eq('horario', horario);
 
-      if (error) console.error("Erro ao desbloquear no Supabase:", error.message);
+      if (error) {
+        console.error("Erro ao desbloquear no Supabase:", error.message);
+        alert("Erro ao desbloquear: " + error.message);
+        return;
+      }
 
+      // Atualiza o localStorage
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.hr === horario || b.horario === horario)));
+      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.horario === horario || b.hr === horario)));
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
 
     } else {
+      // Insere na tabela 'bloqueios' gravando exatamente na coluna 'horario'
       const { error } = await supabaseClient
         .from('bloqueios')
-        .insert([{ data, hr: horario }]);
+        .insert([{ data: data, horario: horario }]);
 
-      if (error) console.error("Erro ao bloquear no Supabase:", error.message);
+      if (error) {
+        console.error("Erro ao bloquear no Supabase:", error.message);
+        alert("Erro ao bloquear no banco de dados: " + error.message);
+        return;
+      }
 
+      // Atualiza o localStorage
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais.push({ data, hr: horario });
+      bloqueiosLocais.push({ data, horario });
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
     }
+
+    // Recarrega a grade e os cards do topo imediatamente
+    await carregarGradeHorariosAdmin(data);
+    await atualizarIndicadoresTopo();
+
   } catch (err) {
-    console.error("Erro na conexão ao alternar bloqueio:", err);
+    console.error("Erro inesperado ao alternar bloqueio:", err);
   }
-
-  await carregarGradeHorariosAdmin(data);
-  await atualizarIndicadoresTopo();
 }
-
-async function bloquearHorarioAdmin(data, horario) {
-  await alternarBloqueioHorario(data, horario, false);
-}
-
-async function desbloquearHorarioAdmin(data, horario) {
-  await alternarBloqueioHorario(data, horario, true);
-}
-
 // 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO
 async function carregarTabelaAgendamentosAdmin() {
   const tabela = document.getElementById('tabelaAgendamentosAdmin');
