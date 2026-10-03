@@ -167,42 +167,41 @@ function trocarAba(idAba, elementoBtn) {
 
   } catch (err) {
     console.error('Erro ao carregar grade admin:', err);
-  }
-}async function alternarBloqueioHorario(data, horario, jaBloqueado) {
+  }async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
-      // Deleta o bloqueio da tabela horarios_bloqueados no Supabase
+      // Deleta o bloqueio usando o nome correto da tabela 'bloqueios' e da coluna 'hr'
       const { error } = await supabaseClient
-        .from('horarios_bloqueados')
+        .from('bloqueios')
         .delete()
         .eq('data', data)
-        .eq('horario', horario);
+        .eq('hr', horario);
 
       if (error) console.error("Erro ao desbloquear no Supabase:", error.message);
 
       // Atualiza o localStorage local
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && b.horario === horario));
+      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.horario === horario || b.hr === horario)));
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
 
     } else {
-      // Insere o novo bloqueio na tabela horarios_bloqueados no Supabase
+      // Insere o novo bloqueio com a coluna 'hr'
       const { error } = await supabaseClient
-        .from('horarios_bloqueados')
-        .insert([{ data, horario }]);
+        .from('bloqueios')
+        .insert([{ data, hr: horario }]);
 
       if (error) console.error("Erro ao bloquear no Supabase:", error.message);
 
       // Atualiza o localStorage local
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais.push({ data, horario });
+      bloqueiosLocais.push({ data, hr: horario });
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
     }
   } catch (err) {
     console.error("Erro na conexão:", err);
   }
 
-  // Recarrega a grade colorida e atualiza os cards do topo na hora
+  // Recarrega a grade e os cards do topo na hora
   if (typeof carregarGradeHorariosAdmin === 'function') {
     await carregarGradeHorariosAdmin();
   }
@@ -211,7 +210,7 @@ function trocarAba(idAba, elementoBtn) {
   }
 }
 
-// Aliases para garantir funcionamento caso o clique chame bloquearHorarioAdmin/desbloquearHorarioAdmin
+// Aliases para evitar erros de função não encontrada
 async function bloquearHorarioAdmin(data, horario) {
   await alternarBloqueioHorario(data, horario, false);
 }
@@ -600,4 +599,4 @@ async function atualizarPrecoServicoNoSupabase(nomeServico, novoPreco) {
     console.error('Erro ao conectar com o Supabase:', err);
     return false;
   }
-}
+}}
