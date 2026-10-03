@@ -103,21 +103,41 @@ function renderizarLista(container, lista, eProximo) {
       // Formatação da data (AAAA-MM-DD -> DD/MM/AAAA)
       const partesData = a.data ? a.data.split('-') : [];
       const dataFormatada = partesData.length === 3 ? `${partesData[2]}/${partesData[1]}/${partesData[0]}` : (a.data || 'Data N/A');
-      const precoFormatado = Number(a.preco || 0).toFixed(2).replace('.', ',');
+      const precoFormatado = Number(a.preco || a.valor || 0).toFixed(2).replace('.', ',');
       const horaExibicao = a.horario || a.hora || 'Horário N/A';
 
       const isCancelado = a.status === 'cancelado';
+      const isConcluido = a.status === 'concluido';
+
+      // Definição das cores e textos da tag de status
+      let badgeHtml = '';
+      if (isConcluido) {
+        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
+          <i class="fa-solid fa-check text-[10px]"></i> Corte Concluído
+        </span>`;
+      } else if (isCancelado) {
+        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-red-950/40 text-red-400 border border-red-900/50 px-2.5 py-0.5 rounded-full">
+          Cancelado
+        </span>`;
+      } else {
+        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-blue-950/50 text-blue-400 border border-blue-900/50 px-2.5 py-0.5 rounded-full">
+          Confirmado
+        </span>`;
+      }
+
+      // Estilo da caixa principal
+      let cardEstilo = 'border-zinc-800 bg-zinc-950/80 text-white';
+      if (isCancelado) cardEstilo = 'border-zinc-900 bg-zinc-950/30 text-zinc-500';
+      if (isConcluido) cardEstilo = 'border-emerald-900/40 bg-zinc-950/90 text-white';
 
       return `
-        <div class="border ${isCancelado ? 'border-zinc-900 bg-zinc-950/30 text-zinc-500' : 'border-zinc-800 bg-zinc-950/80 text-white'} rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition">
+        <div class="border ${cardEstilo} rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition">
           <div class="space-y-1">
             <div class="flex items-center gap-2">
-              <span class="text-xs font-bold uppercase tracking-wider ${isCancelado ? 'bg-red-950/40 text-red-400 border border-red-900/50' : 'bg-emerald-950/50 text-emerald-400 border border-emerald-900/50'} px-2.5 py-0.5 rounded-full">
-                ${isCancelado ? 'Cancelado' : 'Confirmado'}
-              </span>
+              ${badgeHtml}
               <span class="text-xs text-zinc-400"><i class="fa-solid fa-scissors text-red-500 mr-1"></i> ${a.barbeiro || 'HS Barbeiro'}</span>
             </div>
-            <h4 class="font-bold text-base text-zinc-100">${a.servico || 'Corte'}</h4>
+            <h4 class="font-bold text-base text-zinc-100">${a.servico || a.servico_nome || 'Corte'}</h4>
             <div class="flex items-center gap-4 text-xs text-zinc-400 pt-1">
               <span><i class="fa-regular fa-calendar mr-1 text-red-500"></i> ${dataFormatada}</span>
               <span><i class="fa-regular fa-clock mr-1 text-red-500"></i> ${horaExibicao}</span>
@@ -126,7 +146,7 @@ function renderizarLista(container, lista, eProximo) {
           </div>
 
           ${
-            eProximo && !isCancelado
+            eProximo && !isCancelado && !isConcluido
               ? `
             <button 
               type="button" 

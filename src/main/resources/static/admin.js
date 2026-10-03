@@ -263,16 +263,26 @@ async function carregarTabelaAgendamentosAdmin() {
     tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-400">Erro ao carregar agendamentos.</td></tr>`;
   }
 }
-
 async function concluirCorte(idAgendamento) {
+  if (!confirm('Deseja marcar este agendamento como concluído?')) return;
+
   try {
+    // 1. Atualiza o status no Supabase para 'concluido'
     const { error } = await supabaseClient
       .from('agendamentos')
-      .update({ status: 'concluido' })
+      .update({ 
+        status: 'concluido',
+        concluido_em: new Date().toISOString() 
+      })
       .eq('id', idAgendamento);
 
-    if (error) console.error('Erro ao concluir no Supabase:', error.message);
+    if (error) {
+      console.error('Erro ao concluir no Supabase:', error.message);
+      alert('Erro ao atualizar no banco de dados: ' + error.message);
+      return;
+    }
 
+    // 2. Atualiza no localStorage para manter a sincronização local
     let agendamentos = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
     let historico = JSON.parse(localStorage.getItem(DB_KEYS.HISTORICO) || '[]');
 
@@ -289,16 +299,17 @@ async function concluirCorte(idAgendamento) {
       localStorage.setItem(DB_KEYS.HISTORICO, JSON.stringify(historico));
     }
 
-    alert('Corte concluído e adicionado ao faturamento/histórico!');
-    
+    alert('Corte concluído com sucesso!');
+
+    // 3. Recarrega as listas do Admin
     await carregarTabelaAgendamentosAdmin();
     await carregarGradeHorariosAdmin();
     await atualizarIndicadoresTopo();
+
   } catch (err) {
     console.error('Erro ao concluir corte:', err);
   }
 }
-
 async function cancelarAgendamentoAdmin(idAgendamento) {
   if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
 
