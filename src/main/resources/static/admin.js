@@ -81,71 +81,80 @@ function trocarAba(idAba, elementoBtn) {
   if (idAba === 'abaServicos') {
     carregarGerenciadorServicos();
   }
-}
-// 2. GRADE DE HORÁRIOS E BLOQUEIOS (CONECTADA AO SUPABASE)
-async function carregarGradeHorariosAdmin() {
-  const grid = document.getElementById('gridHorariosAdmin');
-  const inputData = document.getElementById('adminDataFiltro');
-  if (!grid || !inputData) return;
+}async function carregarGradeHorariosAdmin(dataFiltro) {
+  const container = document.getElementById('gridHorariosAdmin') || document.getElementById('gradeHorariosAdmin');
+  if (!container) return;
 
-  const dataFiltro = inputData.value;
+  const dataAlvo = dataFiltro || document.getElementById('dataFiltroAdmin')?.value || new Date().toISOString().split('T')[0];
 
-  // 1. Busca agendamentos do Supabase para o dia selecionado
-  const { data: agendamentosDb } = await supabaseClient
-    .from('agendamentos')
-    .select('*')
-    .eq('data', dataFiltro)
-    .neq('status', 'cancelado');
+  try {
+    // 1. Busca APENAS agendamentos CONFIRMADOS no Supabase para esta data
+    const { data: agendamentosDb, error } = await supabaseClient
+      .from('agendamentos')
+      .select('horario, cliente_nome, servico_nome')
+      .eq('data', dataAlvo)
+      .eq('status', 'confirmado');
 
-  // Fallback para o localStorage se necessário
-  const agendamentosLocais = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
-  const agendamentos = (agendamentosDb && agendamentosDb.length > 0) ? agendamentosDb : agendamentosLocais;
+    if (error) console.error('Erro ao buscar grade do Supabase:', error.message);
 
-  // 2. Busca horários bloqueados direto do Supabase
-  const { data: bloqueiosDb } = await supabaseClient
-    .from('horarios_bloqueados')
-    .select('*')
-    .eq('data', dataFiltro);
-
-  const bloqueios = bloqueiosDb || JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-
-  grid.innerHTML = '';
-
-  HORARIOS_PADRAO.forEach(hora => {
-    const agendado = agendamentos.find(a => (a.data === dataFiltro) && (a.horario === hora || a.horario_nome === hora || a.hora === hora));
-    const bloqueado = bloqueios.some(b => b.data === dataFiltro && b.horario === hora);
-
-    let estiloClass = 'bg-green-950/40 border-green-500/60 text-green-400 hover:bg-green-900/50';
-    let statusLabel = 'Livre';
-
-    if (agendado) {
-      estiloClass = 'bg-yellow-950/40 border-yellow-500/60 text-yellow-400 cursor-not-allowed';
-      statusLabel = agendado.cliente_nome || agendado.clienteNome || 'Agendado';
-    } else if (bloqueado) {
-      estiloClass = 'bg-red-950/40 border-red-600/60 text-red-400 hover:bg-red-900/50';
-      statusLabel = 'Bloqueado';
+    // Mapeia os horários ocupados vindos do banco
+    const ocupadosMap = {};
+    if (agendamentosDb) {
+      agendamentosDb.forEach(a => {
+        ocupadosMap[a.horario] = a.cliente_nome || 'Agendado';
+      });
     }
 
-    const card = document.createElement('button');
-    card.type = 'button';
-    card.className = `p-3 border rounded-xl flex flex-col items-center justify-center gap-1 transition ${estiloClass}`;
-    card.innerHTML = `
-      <span class="font-black text-base">${hora}</span>
-      <span class="text-[10px] uppercase font-bold tracking-wider truncate max-w-full">${statusLabel}</span>
-    `;
+    // 2. Busca horários bloqueados manualmente pelo barbeiro
+    const { data: bloqueiosDb } = await supabaseClient
+      .from('horarios_bloqueados')
+      .select('horario')
+      .eq('data', dataAlvo);
 
-    if (!agendado) {
-      card.onclick = () => alternarBloqueioHorario(dataFiltro, hora, bloqueado);
-    }
+    const bloqueadosLista = bloqueiosDb ? bloqueiosDb.map(b => b.horario) : [];
 
-    grid.appendChild(card);
-  });
+    container.innerHTML = '';
 
-  if (typeof atualizarIndicadoresTopo === 'function') {
-    atualizarIndicadoresTopo();
+    // 3. Monta os botões na tela do Admin (09:00 - 12:00 e 14:00 - 21:00)
+    HORARIOS_PADRAO.forEach(horario => {
+      const clienteNome = ocupadosMap[horario];
+      const estaBloqueado = bloqueadosLista.includes(horario);
+
+      const div = document.createElement('div');
+      
+      if (clienteNome) {
+        // Horário Ocupado por um Cliente
+        div.className = 'p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex flex-col justify-between items-start';
+        div.innerHTML = `
+          <span class="font-black text-sm">${horario}</span>
+          <span class="text-xs font-bold text-white truncate max-w-full">${clienteNome}</span>
+          <span class="text-[10px] text-amber-400 uppercase tracking-wider font-semibold">Ocupado</span>
+        `;
+      } else if (estaBloqueado) {
+        // Horário Bloqueado Manualmente
+        div.className = 'p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 flex flex-col justify-between items-start';
+        div.innerHTML = `
+          <span class="font-black text-sm">${horario}</span>
+          <span class="text-xs text-red-300">Bloqueado</span>
+          <button onclick="desbloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="text-[10px] underline hover:text-white mt-1">Desbloquear</button>
+        `;
+      } else {
+        // Horário Livre
+        div.className = 'p-3 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-400 flex flex-col justify-between items-start hover:border-zinc-700 transition';
+        div.innerHTML = `
+          <span class="font-black text-sm text-zinc-200">${horario}</span>
+          <span class="text-xs text-emerald-400 font-medium">Livre</span>
+          <button onclick="bloquearHorarioAdmin('${dataAlvo}', '${horario}')" class="text-[10px] text-zinc-500 hover:text-red-400 mt-1">Bloquear</button>
+        `;
+      }
+
+      container.appendChild(div);
+    });
+
+  } catch (err) {
+    console.error('Erro ao montar grade admin:', err);
   }
 }
-
 async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
