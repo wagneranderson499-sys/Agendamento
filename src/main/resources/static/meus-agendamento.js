@@ -38,9 +38,8 @@ function verificarSessao() {
   if (elNome) {
     elNome.textContent = usuarioLogado.nome || 'Cliente';
   }
-}
-/**
- * 2. Carrega e exibe os agendamentos do usuário logado (Buscando do Supabase)
+}/**
+ * Carrega e exibe os agendamentos do usuário logado (Buscando do Supabase)
  */
 async function carregarMeusAgendamentos() {
   const containerProximos = document.getElementById('containerProximosAgendamentos');
@@ -51,25 +50,39 @@ async function carregarMeusAgendamentos() {
   let meusAgendamentos = [];
 
   try {
-    // 1. Busca os agendamentos do Supabase
-    let query = supabaseClient.from('agendamentos').select('*');
-
-    // Se o usuário estiver logado, filtra por email no banco
-    if (usuarioLogado && usuarioLogado.email) {
-      query = query.eq('cliente_email', usuarioLogado.email);
-    }
-
-    const { data: agendamentosDb, error } = await query
+    // 1. Busca todos os agendamentos no Supabase
+    const { data: agendamentosDb, error } = await supabaseClient
+      .from('agendamentos')
+      .select('*')
       .order('data', { ascending: false })
       .order('horario', { ascending: false });
 
     if (error) {
       console.error('Erro ao buscar do Supabase:', error.message);
     } else if (agendamentosDb && agendamentosDb.length > 0) {
-      meusAgendamentos = agendamentosDb;
-    } else {
-      // Fallback para o localStorage se não vier nada do banco
-      meusAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
+      
+      // 2. Se o usuário estiver logado, filtra os agendamentos dele
+      if (usuarioLogado && usuarioLogado.email) {
+        const emailUser = usuarioLogado.email.trim().toLowerCase();
+        
+        meusAgendamentos = agendamentosDb.filter(a => {
+          const emailAgendamento = (a.cliente_email || a.clienteEmail || a.email || '').trim().toLowerCase();
+          return emailAgendamento === emailUser;
+        });
+      } else {
+        // Se não tiver login ativo por sessão, exibe todos os retornados do banco
+        meusAgendamentos = agendamentosDb;
+      }
+    }
+
+    // Fallback: Se não retornou nada do banco, tenta pegar do localStorage local
+    if (meusAgendamentos.length === 0) {
+      const loc = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
+      if (usuarioLogado && usuarioLogado.email) {
+        meusAgendamentos = loc.filter(a => (a.clienteEmail || a.email) === usuarioLogado.email);
+      } else {
+        meusAgendamentos = loc;
+      }
     }
 
   } catch (err) {
@@ -77,20 +90,19 @@ async function carregarMeusAgendamentos() {
     meusAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
   }
 
-  // Data atual para separar Próximos de Histórico
   const hoje = new Date().toISOString().split('T')[0];
 
-  // PRÓXIMOS: Apenas agendamentos com data de hoje/futura que estejam PENDENTES/CONFIRMADOS (não concluídos e não cancelados)
+  // PRÓXIMOS: Agendamentos de hoje ou futuros que continuam pendentes/confirmados
   const proximos = meusAgendamentos.filter(
     a => a.data >= hoje && a.status !== 'cancelado' && a.status !== 'concluido'
   );
 
-  // HISTÓRICO: Datas passadas OU agendamentos com status 'concluido' ou 'cancelado'
+  // HISTÓRICO: Qualquer agendamento com data passada OU que tenha status 'concluido' ou 'cancelado'
   const historico = meusAgendamentos.filter(
     a => a.data < hoje || a.status === 'cancelado' || a.status === 'concluido'
   );
 
-  // Renderiza no HTML
+  // Renderiza nas telas do cliente
   if (containerProximos) {
     renderizarLista(containerProximos, proximos, true);
   }
@@ -99,7 +111,6 @@ async function carregarMeusAgendamentos() {
     renderizarLista(containerHistorico, historico, false);
   }
 }
-
 /**
  * 3. Renderiza os cards de agendamento no container correto
  */
