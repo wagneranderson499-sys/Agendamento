@@ -199,6 +199,7 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   }
 }
 // 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO
+// 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO (ADMIN)
 async function carregarTabelaAgendamentosAdmin() {
   const tabela = document.getElementById('tabelaAgendamentosAdmin');
   if (!tabela) return;
@@ -206,6 +207,7 @@ async function carregarTabelaAgendamentosAdmin() {
   tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-zinc-500">Buscando agendamentos...</td></tr>`;
 
   try {
+    // Busca do Supabase apenas os agendamentos ativos/pendentes
     const { data: agendamentosDb, error } = await supabaseClient
       .from('agendamentos')
       .select('*')
@@ -216,12 +218,14 @@ async function carregarTabelaAgendamentosAdmin() {
 
     if (error) console.error('Erro ao buscar do Supabase:', error.message);
 
+    let agendamentos = agendamentosDb || [];
+
+    // Busca do localStorage apenas agendamentos locais pendentes (que ainda não foram enviados para o Supabase)
     const agendamentosLocais = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]')
       .filter(a => a.status !== 'cancelado' && a.status !== 'concluido');
 
-    let agendamentos = agendamentosDb || [];
     agendamentosLocais.forEach(local => {
-      const jaExiste = agendamentos.some(s => String(s.id) === String(local.id) || (s.data === local.data && (s.horario || s.hora) === (local.horario || local.hora)));
+      const jaExiste = agendamentos.some(s => String(s.id) === String(local.id));
       if (!jaExiste) {
         agendamentos.push(local);
       }
@@ -244,7 +248,7 @@ async function carregarTabelaAgendamentosAdmin() {
       const valorPreco = a.preco || a.valor || 0;
 
       return `
-        <tr class="hover:bg-zinc-900/50 transition">
+        <tr class="hover:bg-zinc-900/50 transition border-b border-zinc-800/40">
           <td class="py-3 px-2 font-black text-yellow-500">${horaExibicao} <span class="block text-[10px] text-zinc-400 font-normal">${dataFormatada}</span></td>
           <td class="py-3 px-2 font-bold text-white">${nomeCliente} <span class="block text-xs font-normal text-zinc-400">${emailCliente}</span></td>
           <td class="py-3 px-2 text-zinc-300 font-medium">${telefoneCliente}</td>
