@@ -168,8 +168,7 @@ function trocarAba(idAba, elementoBtn) {
   } catch (err) {
     console.error('Erro ao carregar grade admin:', err);
   }
-}
-async function alternarBloqueioHorario(data, horario, jaBloqueado) {
+}async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
       // Deleta o bloqueio da tabela horarios_bloqueados no Supabase
@@ -181,20 +180,20 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
 
       if (error) console.error("Erro ao desbloquear no Supabase:", error.message);
 
-      // Atualiza também o localStorage para sincronizar localmente
+      // Atualiza o localStorage local
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
       bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && b.horario === horario));
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
 
     } else {
-      // Insere o novo bloqueio na tabela horarios_bloqueados do Supabase
+      // Insere o novo bloqueio na tabela horarios_bloqueados no Supabase
       const { error } = await supabaseClient
         .from('horarios_bloqueados')
         .insert([{ data, horario }]);
 
       if (error) console.error("Erro ao bloquear no Supabase:", error.message);
 
-      // Atualiza o localStorage para manter a redundância
+      // Atualiza o localStorage local
       let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
       bloqueiosLocais.push({ data, horario });
       localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
@@ -203,9 +202,24 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
     console.error("Erro na conexão:", err);
   }
 
-  // Recarrega a grade com os novos dados atualizados
-  await carregarGradeHorariosAdmin();
-}// 3. TABELA DE AGENDAMENTOS E CONCLUSÃO (CONECTADA AO SUPABASE)
+  // Recarrega a grade colorida e atualiza os cards do topo na hora
+  if (typeof carregarGradeHorariosAdmin === 'function') {
+    await carregarGradeHorariosAdmin();
+  }
+  if (typeof atualizarIndicadoresTopo === 'function') {
+    await atualizarIndicadoresTopo();
+  }
+}
+
+// Aliases para garantir funcionamento caso o clique chame bloquearHorarioAdmin/desbloquearHorarioAdmin
+async function bloquearHorarioAdmin(data, horario) {
+  await alternarBloqueioHorario(data, horario, false);
+}
+
+async function desbloquearHorarioAdmin(data, horario) {
+  await alternarBloqueioHorario(data, horario, true);
+}
+// 3. TABELA DE AGENDAMENTOS E CONCLUSÃO (CONECTADA AO SUPABASE)
 async function carregarTabelaAgendamentosAdmin() {
   const tabela = document.getElementById('tabelaAgendamentosAdmin');
   if (!tabela) return;
