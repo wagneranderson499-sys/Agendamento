@@ -205,7 +205,8 @@ function selecionarHorario(elemento, hora) {
   if (selectHorario) selectHorario.value = hora;
 }
 // O seu número fixo da barbearia com DDI (55)
-const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamento() {
+const SEU_WHATSAPP_BARBEARIA = '5591991905836';
+async function confirmarAgendamento() {
   if (!servicoSelecionado) {
     alert('Por favor, selecione um serviço/corte.');
     return;
@@ -219,7 +220,7 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
     return;
   }
 
-  // 1. Recupera os dados do usuário logado
+  // 1. Recupera os dados do usuário logado e busca o telefone cadastrado
   let user = null;
   try {
     const { data } = await supabaseClient.auth.getUser();
@@ -228,7 +229,7 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
     console.log('Sessão do Supabase Auth não encontrada, verificando localStorage...');
   }
 
-  const usuarioLocal = JSON.parse(localStorage.getItem('odivelas_usuario_logado')) || usuarioLogado;
+  const usuarioLocal = JSON.parse(localStorage.getItem('odivelas_usuario_logado')) || (typeof usuarioLogado !== 'undefined' ? usuarioLogado : null);
 
   if (!user && !usuarioLocal) {
     alert('Sua sessão expirou ou você não está logado. Por favor, faça login para agendar.');
@@ -236,14 +237,19 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
     return;
   }
 
+  // Busca o telefone do user_metadata (Auth do Supabase) ou do LocalStorage de forma exaustiva
+  const meta = user?.user_metadata || {};
+  const telefoneDoCadastro = meta.telefone || meta.whatsapp || meta.celular || usuarioLocal?.telefone || usuarioLocal?.whatsapp || usuarioLocal?.celular || '(00) 00000-0000';
+  const nomeDoCadastro = meta.nome || meta.full_name || usuarioLocal?.nome || 'Cliente';
+
   const clienteAtual = {
     id: user ? user.id : (usuarioLocal?.id || 'USR-' + Date.now()),
-    nome: user?.user_metadata?.nome || usuarioLocal?.nome || 'Cliente',
-    telefone: user?.user_metadata?.telefone || usuarioLocal?.telefone || usuarioLocal?.whatsapp || '(00) 00000-0000',
+    nome: nomeDoCadastro,
+    telefone: telefoneDoCadastro,
     email: user?.email || usuarioLocal?.email || 'cliente@odivelas.com'
   };
 
-  // 2. GRAVA NO SUPABASE (Com o número de telefone/WhatsApp incluído)
+  // 2. GRAVA NO SUPABASE (Enviando cliente_telefone e cliente_nome para o banco)
   try {
     const { data: agendamentoSalvo, error: erroSupa } = await supabaseClient
       .from('agendamentos')
@@ -251,7 +257,7 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
         {
           usuario_id: clienteAtual.id,
           cliente_nome: clienteAtual.nome,
-          cliente_telefone: clienteAtual.telefone, // Envia o número de WhatsApp
+          cliente_telefone: clienteAtual.telefone, // Persiste o WhatsApp na coluna do Supabase
           servico_nome: servicoSelecionado.nome,
           preco: parseFloat(servicoSelecionado.preco),
           data: dataSelecionada,
@@ -274,7 +280,7 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
     clienteNome: clienteAtual.nome,
     clienteTelefone: clienteAtual.telefone,
     clienteEmail: clienteAtual.email,
-    barbeiro: barbeiroSelecionado || 'Odivelas',
+    barbeiro: typeof barbeiroSelecionado !== 'undefined' ? barbeiroSelecionado : 'Odivelas',
     servico: servicoSelecionado.nome,
     preco: servicoSelecionado.preco,
     data: dataSelecionada,
@@ -292,23 +298,20 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
   const dataFormatada = `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
   const precoFormatado = Number(servicoSelecionado.preco).toFixed(2).replace('.', ',');
 
-  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591985793959"; // Seu número com DDD (ex: 5591980000000)
+  const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591991905836";
 
-  const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia, você cliente pode voltar ao sistema para ver seus agendamentos*:\n\n` +
+  const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
     `👤 *Cliente:* ${clienteAtual.nome}\n` +
     `📱 *Contato:* ${clienteAtual.telefone}\n` +
     `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
     `📅 *Data:* ${dataFormatada}\n` +
     `⏰ *Horário:* ${horarioSelecionado}\n` +
-    `💈 *Barbeiro:* ${barbeiroSelecionado || 'Odivelas'}`;
+    `💈 *Barbeiro:* ${typeof barbeiroSelecionado !== 'undefined' ? barbeiroSelecionado : 'Odivelas'}`;
 
   const linkZap = `https://wa.me/${numeroBarbeiro}?text=${encodeURIComponent(mensagemWhatsApp)}`;
 
   // 5. REDIRECIONA PARA O MEUS-AGENDAMENTOS E ABRE O WHATSAPP IMEDIATAMENTE
-  // Primeiro mudamos a aba atual para o histórico do cliente
   window.location.href = 'meus-agendamentos.html';
-
-  // Em seguida (no mesmo instante), acionamos a abertura do WhatsApp
   window.open(linkZap, '_blank') || (window.location.href = linkZap);
 }
 // Busca os servicos e preços atualizados direto da tabela do Supabase
