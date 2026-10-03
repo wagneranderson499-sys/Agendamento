@@ -142,23 +142,44 @@ function renderizarLista(container, lista, eProximo) {
     })
     .join('');
 }
-
 /**
- * 4. Cancela um agendamento
+ * 4. Cancela um agendamento (Conectado ao Supabase)
  */
-function cancelarAgendamento(idAgendamento) {
+async function cancelarAgendamento(idAgendamento) {
   if (!confirm('Deseja realmente cancelar este agendamento?')) return;
 
-  const todosAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
-  const index = todosAgendamentos.findIndex((a) => String(a.id) === String(idAgendamento));
+  try {
+    // 1. Atualiza o status para 'cancelado' no Supabase
+    const { error } = await supabaseClient
+      .from('agendamentos')
+      .update({ status: 'cancelado' })
+      .eq('id', idAgendamento);
 
-  if (index !== -1) {
-    todosAgendamentos[index].status = 'cancelado';
-    localStorage.setItem('odivelas_agendamentos', JSON.stringify(todosAgendamentos));
-    alert('Agendamento cancelado com sucesso.');
-    carregarMeusAgendamentos();
-  } else {
-    alert('Erro ao localizar o agendamento.');
+    if (error) {
+      console.error('Erro ao cancelar no Supabase:', error.message);
+    }
+
+    // 2. Atualiza o localStorage do cliente para manter a consistência
+    const todosAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
+    const index = todosAgendamentos.findIndex((a) => String(a.id) === String(idAgendamento));
+
+    if (index !== -1) {
+      todosAgendamentos[index].status = 'cancelado';
+      localStorage.setItem('odivelas_agendamentos', JSON.stringify(todosAgendamentos));
+    }
+
+    alert('Agendamento cancelado com sucesso! O horário foi liberado.');
+    
+    // 3. Atualiza a tela de Meus Agendamentos
+    if (typeof carregarMeusAgendamentos === 'function') {
+      carregarMeusAgendamentos();
+    } else {
+      window.location.reload();
+    }
+
+  } catch (err) {
+    console.error('Erro ao processar cancelamento:', err);
+    alert('Erro de conexão ao tentar cancelar. Tente novamente.');
   }
 }
 
