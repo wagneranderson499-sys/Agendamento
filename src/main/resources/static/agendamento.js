@@ -243,13 +243,15 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
     email: user?.email || usuarioLocal?.email || 'cliente@odivelas.com'
   };
 
-  // 2. GRAVA NO SUPABASE (Para aparecer na Tela do Admin e no Histórico)
+  // 2. GRAVA NO SUPABASE (Com o número de telefone/WhatsApp incluído)
   try {
     const { data: agendamentoSalvo, error: erroSupa } = await supabaseClient
       .from('agendamentos')
       .insert([
         {
           usuario_id: clienteAtual.id,
+          cliente_nome: clienteAtual.nome,
+          cliente_telefone: clienteAtual.telefone, // Envia o número de WhatsApp
           servico_nome: servicoSelecionado.nome,
           preco: parseFloat(servicoSelecionado.preco),
           data: dataSelecionada,
@@ -292,7 +294,7 @@ const SEU_WHATSAPP_BARBEARIA = '5591985793959';async function confirmarAgendamen
 
   const numeroBarbeiro = typeof SEU_WHATSAPP_BARBEARIA !== 'undefined' ? SEU_WHATSAPP_BARBEARIA : "5591985793959"; // Seu número com DDD (ex: 5591980000000)
 
-  const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
+  const mensagemWhatsApp = `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia, você cliente pode voltar ao sistema para ver seus agendamentos*:\n\n` +
     `👤 *Cliente:* ${clienteAtual.nome}\n` +
     `📱 *Contato:* ${clienteAtual.telefone}\n` +
     `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
