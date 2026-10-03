@@ -167,47 +167,56 @@ function trocarAba(idAba, elementoBtn) {
 
   } catch (err) {
     console.error('Erro ao carregar grade admin:', err);
-  }async function alternarBloqueioHorario(data, horario, jaBloqueado) {
+    async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
-      // Deleta o bloqueio usando o nome correto da tabela 'bloqueios' e da coluna 'hr'
+      // Desbloqueia na tabela bloqueios usando a coluna hr
       const { error } = await supabaseClient
         .from('bloqueios')
         .delete()
-        .eq('data', data)
-        .eq('hr', horario);
+        .match({ data: data, hr: horario });
 
-      if (error) console.error("Erro ao desbloquear no Supabase:", error.message);
-
-      // Atualiza o localStorage local
-      let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.horario === horario || b.hr === horario)));
-      localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
-
+      if (error) {
+        // Tentativa de fallback se na sua tabela a coluna for 'horario'
+        await supabaseClient.from('bloqueios').delete().match({ data: data, horario: horario });
+      }
     } else {
-      // Insere o novo bloqueio com a coluna 'hr'
+      // Bloqueia inserindo na tabela bloqueios
       const { error } = await supabaseClient
         .from('bloqueios')
-        .insert([{ data, hr: horario }]);
+        .insert([{ data: data, hr: horario }]);
 
-      if (error) console.error("Erro ao bloquear no Supabase:", error.message);
-
-      // Atualiza o localStorage local
-      let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
-      bloqueiosLocais.push({ data, hr: horario });
-      localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
+      if (error) {
+        // Tentativa de fallback se na sua tabela a coluna for 'horario'
+        await supabaseClient.from('bloqueios').insert([{ data: data, horario: horario }]);
+      }
     }
+
+    // Sincroniza o localStorage local
+    let bloqueiosLocais = JSON.parse(localStorage.getItem(DB_KEYS.BLOQUEIOS) || '[]');
+    if (jaBloqueado) {
+      bloqueiosLocais = bloqueiosLocais.filter(b => !(b.data === data && (b.hr === horario || b.horario === horario)));
+    } else {
+      bloqueiosLocais.push({ data, hr: horario });
+    }
+    localStorage.setItem(DB_KEYS.BLOQUEIOS, JSON.stringify(bloqueiosLocais));
+
   } catch (err) {
-    console.error("Erro na conexão:", err);
+    console.error("Erro ao alternar bloqueio:", err);
   }
 
-  // Recarrega a grade e os cards do topo na hora
-  if (typeof carregarGradeHorariosAdmin === 'function') {
-    await carregarGradeHorariosAdmin();
-  }
-  if (typeof atualizarIndicadoresTopo === 'function') {
-    await atualizarIndicadoresTopo();
-  }
+  // Recarrega a grade e o topo
+  if (typeof carregarGradeHorariosAdmin === 'function') await carregarGradeHorariosAdmin();
+  if (typeof atualizarIndicadoresTopo === 'function') await atualizarIndicadoresTopo();
+}
+
+// Atalhos mantidos caso o onclick do botão chame pelo nome antigo
+async function bloquearHorarioAdmin(data, horario) {
+  await alternarBloqueioHorario(data, horario, false);
+}
+
+async function desbloquearHorarioAdmin(data, horario) {
+  await alternarBloqueioHorario(data, horario, true);
 }
 
 // Aliases para evitar erros de função não encontrada
@@ -600,3 +609,4 @@ async function atualizarPrecoServicoNoSupabase(nomeServico, novoPreco) {
     return false;
   }
 }}
+}
