@@ -266,18 +266,14 @@ async function carregarTabelaAgendamentosAdmin() {
     console.error('Erro na renderização:', err);
     tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-400">Erro ao carregar agendamentos.</td></tr>`;
   }
-}
-async function concluirCorte(idAgendamento) {
+}async function concluirCorte(idAgendamento) {
   if (!confirm('Deseja marcar este agendamento como concluído?')) return;
 
   try {
-    // 1. Atualiza o status no Supabase para 'concluido'
+    // 1. Atualiza apenas o status no Supabase para 'concluido'
     const { error } = await supabaseClient
       .from('agendamentos')
-      .update({ 
-        status: 'concluido',
-        concluido_em: new Date().toISOString() 
-      })
+      .update({ status: 'concluido' })
       .eq('id', idAgendamento);
 
     if (error) {
@@ -286,32 +282,31 @@ async function concluirCorte(idAgendamento) {
       return;
     }
 
-    // 2. Atualiza no localStorage para manter a sincronização local
+    // 2. Atualiza a cópia local no localStorage
     let agendamentos = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
-    let historico = JSON.parse(localStorage.getItem(DB_KEYS.HISTORICO) || '[]');
-
     const index = agendamentos.findIndex(a => String(a.id) === String(idAgendamento));
+    
     if (index !== -1) {
-      const corteFinalizado = agendamentos[index];
-      corteFinalizado.status = 'concluido';
-      corteFinalizado.concluidoEm = new Date().toISOString();
-
-      historico.push(corteFinalizado);
-      agendamentos.splice(index, 1);
-
+      agendamentos[index].status = 'concluido';
       localStorage.setItem(DB_KEYS.AGENDAMENTOS, JSON.stringify(agendamentos));
-      localStorage.setItem(DB_KEYS.HISTORICO, JSON.stringify(historico));
     }
 
     alert('Corte concluído com sucesso!');
 
-    // 3. Recarrega as listas do Admin
-    await carregarTabelaAgendamentosAdmin();
-    await carregarGradeHorariosAdmin();
-    await atualizarIndicadoresTopo();
+    // 3. Recarrega as listas do Admin (o agendamento sai dos pendentes)
+    if (typeof carregarTabelaAgendamentosAdmin === 'function') {
+      await carregarTabelaAgendamentosAdmin();
+    }
+    if (typeof carregarGradeHorariosAdmin === 'function') {
+      await carregarGradeHorariosAdmin();
+    }
+    if (typeof atualizarIndicadoresTopo === 'function') {
+      await atualizarIndicadoresTopo();
+    }
 
   } catch (err) {
-    console.error('Erro ao concluir corte:', err);
+    console.error('Erro na função concluirCorte:', err);
+    alert('Ocorreu um erro ao concluir o corte.');
   }
 }
 async function cancelarAgendamentoAdmin(idAgendamento) {
