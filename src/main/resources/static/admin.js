@@ -221,15 +221,8 @@ async function carregarTabelaAgendamentosAdmin() {
     let agendamentos = agendamentosDb || [];
 
     // Busca do localStorage apenas agendamentos locais pendentes (que ainda não foram enviados para o Supabase)
-    const agendamentosLocais = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]')
-      .filter(a => a.status !== 'cancelado' && a.status !== 'concluido');
-
-    agendamentosLocais.forEach(local => {
-      const jaExiste = agendamentos.some(s => String(s.id) === String(local.id));
-      if (!jaExiste) {
-        agendamentos.push(local);
-      }
-    });
+ 
+    ;
 
     if (agendamentos.length === 0) {
       tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-zinc-500">Nenhum agendamento pendente encontrado.</td></tr>`;
