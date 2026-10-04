@@ -38,16 +38,11 @@ function verificarSessao() {
   if (elNome) {
     elNome.textContent = usuarioLogado.nome || 'Cliente';
   }
-}/**
- * Carrega e exibe os agendamentos do usuário logado (Buscando do Supabase)
- */
-async function carregarMeusAgendamentos() {
+}async function carregarMeusAgendamentos() {
   const containerProximos = document.getElementById('containerProximosAgendamentos');
   const containerHistorico = document.getElementById('containerHistoricoAgendamentos');
 
   if (!containerProximos && !containerHistorico) return;
-
-  let meusAgendamentos = [];
 
   try {
     // 1. Busca todos os agendamentos no Supabase
@@ -58,57 +53,50 @@ async function carregarMeusAgendamentos() {
       .order('horario', { ascending: false });
 
     if (error) {
-      console.error('Erro ao buscar do Supabase:', error.message);
-    } else if (agendamentosDb && agendamentosDb.length > 0) {
-      
-      // 2. Se o usuário estiver logado, filtra os agendamentos dele
-      if (usuarioLogado && usuarioLogado.email) {
-        const emailUser = usuarioLogado.email.trim().toLowerCase();
-        
-        meusAgendamentos = agendamentosDb.filter(a => {
-          const emailAgendamento = (a.cliente_email || a.clienteEmail || a.email || '').trim().toLowerCase();
-          return emailAgendamento === emailUser;
-        });
-      } else {
-        // Se não tiver login ativo por sessão, exibe todos os retornados do banco
-        meusAgendamentos = agendamentosDb;
+      console.error('Erro ao buscar agendamentos do Supabase:', error.message);
+      return;
+    }
+
+    let meusAgendamentos = agendamentosDb || [];
+
+    // 2. Se o usuário estiver logado, filtra pelo ID do usuário
+    if (typeof usuarioLogado !== 'undefined' && usuarioLogado && usuarioLogado.id) {
+      const userId = String(usuarioLogado.id);
+
+      const filtrados = meusAgendamentos.filter(a => {
+        // Mapeia possíveis nomes da coluna de ID na tabela agendamentos
+        const agendamentoUserId = String(a.user_id || a.cliente_id || a.clienteId || a.id_usuario || '');
+        return agendamentoUserId === userId;
+      });
+
+      if (filtrados.length > 0) {
+        meusAgendamentos = filtrados;
       }
     }
 
-    // Fallback: Se não retornou nada do banco, tenta pegar do localStorage local
-    if (meusAgendamentos.length === 0) {
-      const loc = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
-      if (usuarioLogado && usuarioLogado.email) {
-        meusAgendamentos = loc.filter(a => (a.clienteEmail || a.email) === usuarioLogado.email);
-      } else {
-        meusAgendamentos = loc;
-      }
+    const hoje = new Date().toISOString().split('T')[0];
+
+    // PRÓXIMOS: Apenas pendentes/confirmados com data de hoje ou futura
+    const proximos = meusAgendamentos.filter(
+      a => a.data >= hoje && a.status !== 'cancelado' && a.status !== 'concluido'
+    );
+
+    // HISTÓRICO: Cortes concluídos, cancelados OU datas passadas
+    const historico = meusAgendamentos.filter(
+      a => a.status === 'concluido' || a.status === 'cancelado' || a.data < hoje
+    );
+
+    // 3. Renderiza na tela do cliente
+    if (containerProximos) {
+      renderizarLista(containerProximos, proximos, true);
+    }
+
+    if (containerHistorico) {
+      renderizarLista(containerHistorico, historico, false);
     }
 
   } catch (err) {
-    console.error('Erro na conexão com Supabase:', err);
-    meusAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
-  }
-
-  const hoje = new Date().toISOString().split('T')[0];
-
-  // PRÓXIMOS: Agendamentos de hoje ou futuros que continuam pendentes/confirmados
-  const proximos = meusAgendamentos.filter(
-    a => a.data >= hoje && a.status !== 'cancelado' && a.status !== 'concluido'
-  );
-
-  // HISTÓRICO: Qualquer agendamento com data passada OU que tenha status 'concluido' ou 'cancelado'
-  const historico = meusAgendamentos.filter(
-    a => a.data < hoje || a.status === 'cancelado' || a.status === 'concluido'
-  );
-
-  // Renderiza nas telas do cliente
-  if (containerProximos) {
-    renderizarLista(containerProximos, proximos, true);
-  }
-
-  if (containerHistorico) {
-    renderizarLista(containerHistorico, historico, false);
+    console.error('Erro ao carregar meus agendamentos:', err);
   }
 }
 /**
