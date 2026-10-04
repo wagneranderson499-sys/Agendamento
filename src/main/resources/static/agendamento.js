@@ -135,17 +135,12 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
   if (elTexto) elTexto.innerText = textoExibicao;
 
   carregarHorarios(dataISO);
-}
-// 5. Carrega os horários (verificando agendamentos ocupados E bloqueios do Admin no Supabase)
-async function carregarHorarios(dataISO) {
+}async function carregarHorarios(dataISO) {
   const container = document.getElementById('containerHorarios');
   if (!container) return;
   
   container.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-2">Buscando horários disponíveis...</p>';
   horarioSelecionado = '';
-  
-  const selectHorario = document.getElementById('selectHorario');
-  if (selectHorario) selectHorario.value = '';
 
   const horariosConfigurados = JSON.parse(localStorage.getItem('admin_horarios')) || [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00',
@@ -158,47 +153,33 @@ async function carregarHorarios(dataISO) {
   let bloqueadosNoDia = [];
 
   try {
-    // 1. Busca agendamentos ativos no Supabase para esta data
+    // 1. Busca os agendamentos ocupados por clientes
     const { data: agendamentosDb, error: errAgendamentos } = await supabaseClient
       .from('agendamentos')
-      .select('horario, hora, status')
+      .select('horario, hora')
       .eq('data', dataISO)
       .neq('status', 'cancelado');
 
-    if (errAgendamentos) {
-      console.error('Erro ao buscar agendamentos do Supabase:', errAgendamentos.message);
-    } else if (agendamentosDb) {
+    if (!errAgendamentos && agendamentosDb) {
       ocupadosNoDia = agendamentosDb.map(a => a.horario || a.hora);
     }
 
-    // 2. Busca bloqueios feitos pelo Admin no Supabase para esta data
+    // 2. Busca os bloqueios do admin usando as colunas exatas: data e horario
     const { data: bloqueiosDb, error: errBloqueios } = await supabaseClient
       .from('bloqueios')
-      .select('horario, hr, hora')
+      .select('horario')
       .eq('data', dataISO);
 
     if (errBloqueios) {
-      console.error('Erro ao buscar bloqueios do Supabase:', errBloqueios.message);
+      console.error('Erro na RLS ou busca da tabela bloqueios:', errBloqueios.message);
     } else if (bloqueiosDb) {
-      bloqueadosNoDia = bloqueiosDb.map(b => b.horario || b.hr || b.hora);
+      bloqueadosNoDia = bloqueiosDb.map(b => b.horario);
     }
 
   } catch (err) {
-    console.error('Erro na sincronização de horários com Supabase:', err);
-    
-    // Fallback para localStorage caso haja falha de conexão
-    const agendamentosLocais = JSON.parse(localStorage.getItem('odivelas_agendamentos')) || [];
-    ocupadosNoDia = agendamentosLocais
-      .filter(a => a.data === dataISO && a.status !== 'cancelado')
-      .map(a => a.horario || a.hora);
-
-    const bloqueiosLocais = JSON.parse(localStorage.getItem('odivelas_bloqueIOS') || localStorage.getItem('odivelas_bloqueios')) || [];
-    bloqueadosNoDia = bloqueiosLocais
-      .filter(b => b.data === dataISO)
-      .map(b => b.horario || b.hr || b.hora);
+    console.error('Erro de conexão ao carregar horários:', err);
   }
 
-  // Limpa o container para montar os botões de horário
   container.innerHTML = '';
 
   horariosConfigurados.forEach(hora => {
@@ -221,8 +202,7 @@ async function carregarHorarios(dataISO) {
 
     container.appendChild(btnHora);
   });
-}
-function selecionarHorario(elemento, hora) {
+}function selecionarHorario(elemento, hora) {
   document.querySelectorAll('.hora-card').forEach(btn => {
     if (!btn.disabled) {
       btn.classList.remove('border-red-600', 'bg-red-600', 'text-white');
