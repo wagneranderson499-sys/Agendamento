@@ -136,36 +136,70 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
 
   carregarHorarios(dataISO);
 }
-
-// 5. Carrega os horários (verificando agendamentos ocupados E bloqueios do Admin)
-function carregarHorarios(dataISO) {
+// 5. Carrega os horários (verificando agendamentos ocupados E bloqueios do Admin no Supabase)
+async function carregarHorarios(dataISO) {
   const container = document.getElementById('containerHorarios');
   if (!container) return;
   
-  container.innerHTML = '';
+  container.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-2">Buscando horários disponíveis...</p>';
   horarioSelecionado = '';
   
   const selectHorario = document.getElementById('selectHorario');
   if (selectHorario) selectHorario.value = '';
 
-const horariosConfigurados = JSON.parse(localStorage.getItem('admin_horarios')) || [
+  const horariosConfigurados = JSON.parse(localStorage.getItem('admin_horarios')) || [
     '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00',
     '14:00', '14:30', '15:00', '15:30', '16:00', '16:30',
     '17:00', '17:30', '18:00', '18:30', '19:00', '19:30',
     '20:00', '20:30', '21:00'
   ];
 
-  // 1. Agendamentos Ocupados por Clientes
-  const agendamentosExistentes = JSON.parse(localStorage.getItem('odivelas_agendamentos')) || [];
-  const ocupadosNoDia = agendamentosExistentes
-    .filter(a => a.data === dataISO && a.status !== 'cancelado')
-    .map(a => a.horario);
+  let ocupadosNoDia = [];
+  let bloqueadosNoDia = [];
 
-  // 2. Horários Bloqueados pelo Admin
-  const bloqueiosAdmin = JSON.parse(localStorage.getItem('odivelas_bloqueIOS')) || [];
-  const bloqueadosNoDia = bloqueiosAdmin
-    .filter(b => b.data === dataISO)
-    .map(b => b.horario);
+  try {
+    // 1. Busca agendamentos ativos no Supabase para esta data
+    const { data: agendamentosDb, error: errAgendamentos } = await supabaseClient
+      .from('agendamentos')
+      .select('horario, hora, status')
+      .eq('data', dataISO)
+      .neq('status', 'cancelado');
+
+    if (errAgendamentos) {
+      console.error('Erro ao buscar agendamentos do Supabase:', errAgendamentos.message);
+    } else if (agendamentosDb) {
+      ocupadosNoDia = agendamentosDb.map(a => a.horario || a.hora);
+    }
+
+    // 2. Busca bloqueios feitos pelo Admin no Supabase para esta data
+    const { data: bloqueiosDb, error: errBloqueios } = await supabaseClient
+      .from('bloqueios')
+      .select('horario, hr, hora')
+      .eq('data', dataISO);
+
+    if (errBloqueios) {
+      console.error('Erro ao buscar bloqueios do Supabase:', errBloqueios.message);
+    } else if (bloqueiosDb) {
+      bloqueadosNoDia = bloqueiosDb.map(b => b.horario || b.hr || b.hora);
+    }
+
+  } catch (err) {
+    console.error('Erro na sincronização de horários com Supabase:', err);
+    
+    // Fallback para localStorage caso haja falha de conexão
+    const agendamentosLocais = JSON.parse(localStorage.getItem('odivelas_agendamentos')) || [];
+    ocupadosNoDia = agendamentosLocais
+      .filter(a => a.data === dataISO && a.status !== 'cancelado')
+      .map(a => a.horario || a.hora);
+
+    const bloqueiosLocais = JSON.parse(localStorage.getItem('odivelas_bloqueIOS') || localStorage.getItem('odivelas_bloqueios')) || [];
+    bloqueadosNoDia = bloqueiosLocais
+      .filter(b => b.data === dataISO)
+      .map(b => b.horario || b.hr || b.hora);
+  }
+
+  // Limpa o container para montar os botões de horário
+  container.innerHTML = '';
 
   horariosConfigurados.forEach(hora => {
     const isOcupado = ocupadosNoDia.includes(hora);
@@ -188,7 +222,6 @@ const horariosConfigurados = JSON.parse(localStorage.getItem('admin_horarios')) 
     container.appendChild(btnHora);
   });
 }
-
 function selecionarHorario(elemento, hora) {
   document.querySelectorAll('.hora-card').forEach(btn => {
     if (!btn.disabled) {
