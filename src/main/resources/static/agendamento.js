@@ -174,6 +174,7 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
       console.error('Erro na RLS ou busca da tabela bloqueios:', errBloqueios.message);
     } else if (bloqueiosDb) {
       bloqueadosNoDia = bloqueiosDb.map(b => b.horario);
+      console.log('BLOQUEIOS DO DIA:', bloqueadosNoDia);
     }
 
   } catch (err) {
