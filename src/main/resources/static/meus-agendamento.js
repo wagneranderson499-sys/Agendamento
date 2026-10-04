@@ -39,11 +39,10 @@ function verificarSessao() {
     elNome.textContent = usuarioLogado.nome || 'Cliente';
   }
 }async function carregarMeusAgendamentos() {
-  const containerProximos = document.getElementById('containerProximosAgendamentos');
-  const containerHistorico = document.getElementById('containerHistoricoAgendamentos');
 
-  if (!containerProximos && !containerHistorico) return;
+  const container = document.getElementById('listaAgendamentos');
 
+  if (!container) return;
   try {
     // 1. Busca todos os agendamentos no Supabase
     const { data: agendamentosDb, error } = await supabaseClient
@@ -93,16 +92,10 @@ return agendamentoUserId === userId;
     const historico = meusAgendamentos.filter(
       a => a.status === 'concluido' || a.status === 'cancelado' || a.data < hoje
     );
+// 3. Junta próximos e histórico e renderiza na tela
+const todos = [...proximos, ...historico];
 
-    // 3. Renderiza na tela do cliente
-    if (containerProximos) {
-      renderizarLista(containerProximos, proximos, true);
-    }
-
-    if (containerHistorico) {
-      renderizarLista(containerHistorico, historico, false);
-    }
-
+renderizarLista(container, todos, true);
   } catch (err) {
     console.error('Erro ao carregar meus agendamentos:', err);
   }
@@ -169,7 +162,7 @@ function renderizarLista(container, lista, eProximo) {
           </div>
 
           ${
-            eProximo && !isCancelado && !isConcluido
+           a.status === 'confirmado'
               ? `
             <button 
               type="button" 
@@ -184,15 +177,13 @@ function renderizarLista(container, lista, eProximo) {
       `;
     })
     .join('');
-}
-/**
- * 4. Cancela um agendamento (Conectado ao Supabase)
- */
-async function cancelarAgendamento(idAgendamento) {
+}async function cancelarAgendamento(idAgendamento) {
+
   if (!confirm('Deseja realmente cancelar este agendamento?')) return;
 
   try {
-    // 1. Atualiza o status para 'cancelado' no Supabase
+
+    // Atualiza o status diretamente no Supabase
     const { error } = await supabaseClient
       .from('agendamentos')
       .update({ status: 'cancelado' })
@@ -200,32 +191,22 @@ async function cancelarAgendamento(idAgendamento) {
 
     if (error) {
       console.error('Erro ao cancelar no Supabase:', error.message);
-    }
-
-    // 2. Atualiza o localStorage do cliente para manter a consistência
-    const todosAgendamentos = JSON.parse(localStorage.getItem('odivelas_agendamentos') || '[]');
-    const index = todosAgendamentos.findIndex((a) => String(a.id) === String(idAgendamento));
-
-    if (index !== -1) {
-      todosAgendamentos[index].status = 'cancelado';
-      localStorage.setItem('odivelas_agendamentos', JSON.stringify(todosAgendamentos));
+      alert('Erro ao cancelar o agendamento.');
+      return;
     }
 
     alert('Agendamento cancelado com sucesso! O horário foi liberado.');
-    
-    // 3. Atualiza a tela de Meus Agendamentos
-    if (typeof carregarMeusAgendamentos === 'function') {
-      carregarMeusAgendamentos();
-    } else {
-      window.location.reload();
-    }
+
+    // Atualiza a tela novamente buscando os dados do Supabase
+    await carregarMeusAgendamentos();
 
   } catch (err) {
+
     console.error('Erro ao processar cancelamento:', err);
     alert('Erro de conexão ao tentar cancelar. Tente novamente.');
+
   }
 }
-
 /**
  * 5. Fazer Logout da Conta
  */
