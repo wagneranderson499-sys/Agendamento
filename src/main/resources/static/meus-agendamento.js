@@ -65,8 +65,16 @@ function verificarSessao() {
 
       const filtrados = meusAgendamentos.filter(a => {
         // Mapeia possíveis nomes da coluna de ID na tabela agendamentos
-        const agendamentoUserId = String(a.user_id || a.cliente_id || a.clienteId || a.id_usuario || '');
-        return agendamentoUserId === userId;
+      const agendamentoUserId = String(
+  a.usuario_id ||
+  a.user_id ||
+  a.cliente_id ||
+  a.clienteId ||
+  a.id_usuario ||
+  ''
+);
+
+return agendamentoUserId === userId;
       });
 
       if (filtrados.length > 0) {
