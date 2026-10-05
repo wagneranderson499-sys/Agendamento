@@ -156,7 +156,7 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
     // 1. Busca os agendamentos ocupados por clientes
     const { data: agendamentosDb, error: errAgendamentos } = await supabaseClient
       .from('agendamentos')
-      .select('horario, hora')
+      .select('horario')
       .eq('data', dataISO)
       .neq('status', 'cancelado');
 
