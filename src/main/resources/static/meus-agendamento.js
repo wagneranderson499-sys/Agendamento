@@ -57,6 +57,8 @@ function verificarSessao() {
     }
 
     let meusAgendamentos = agendamentosDb || [];
+    console.log('USUÁRIO LOGADO:', usuarioLogado);
+console.log('AGENDAMENTOS VINDOS DO SUPABASE:', agendamentosDb);
 
     // 2. Se o usuário estiver logado, filtra pelo ID do usuário
     if (typeof usuarioLogado !== 'undefined' && usuarioLogado && usuarioLogado.id) {
