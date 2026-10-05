@@ -162,6 +162,8 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
 
     if (!errAgendamentos && agendamentosDb) {
       ocupadosNoDia = agendamentosDb.map(a => a.horario || a.hora);
+      console.log('AGENDAMENTOS DO DIA:', agendamentosDb);
+console.log('HORÁRIOS OCUPADOS:', ocupadosNoDia);
     }
 
     // 2. Busca os bloqueios do admin usando as colunas exatas: data e horario
