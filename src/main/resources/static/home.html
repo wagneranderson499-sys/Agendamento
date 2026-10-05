@@ -43,13 +43,16 @@
     ::-webkit-scrollbar {
       width: 6px;
     }
+
     ::-webkit-scrollbar-track {
       background: #0a0a0c;
     }
+
     ::-webkit-scrollbar-thumb {
       background: #27272a;
       border-radius: 3px;
     }
+
     ::-webkit-scrollbar-thumb:hover {
       background: #dc2626;
     }
@@ -59,6 +62,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
+
     .text-gradient-gold {
       background: linear-gradient(135deg, #fef08a 0%, #eab308 50%, #ca8a04 100%);
       -webkit-background-clip: text;
@@ -71,23 +75,26 @@
 
   <header class="sticky top-0 z-50 bg-brand-black/95 backdrop-blur-md border-b border-zinc-800/80">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
-      
+
       <!-- Logo -->
-      <!-- Logo -->
-<a href="cadastroLogin.html" class="flex items-center gap-2 sm:gap-3 group">
-  <!-- Imagem da Logo -->
-  <img src="barbearia (1).png" alt="Odivelas Barbearia" class="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50">
-  
-  <!-- Nome ao lado da logo (opcional) -->
-  <div class="flex flex-col">
-    <span class="font-title font-black text-base sm:text-xl tracking-wider text-white uppercase leading-none">
-      ODIVELAS
-    </span>
-    <span class="font-title text-[10px] sm:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase leading-tight">
-      BARBEARIA
-    </span>
-  </div>
-</a>
+      <a href="cadastroLogin.html" class="flex items-center gap-2 sm:gap-3 group">
+
+        <!-- Imagem da Logo -->
+        <img src="barbearia (1).png" alt="Odivelas Barbearia"
+          class="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50">
+
+        <!-- Nome ao lado da logo -->
+        <div class="flex flex-col">
+          <span class="font-title font-black text-base sm:text-xl tracking-wider text-white uppercase leading-none">
+            ODIVELAS
+          </span>
+
+          <span class="font-title text-[10px] sm:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase leading-tight">
+            BARBEARIA
+          </span>
+        </div>
+
+      </a>
 
       <!-- Desktop Nav -->
       <nav class="hidden lg:flex items-center gap-8 text-xs uppercase tracking-widest font-semibold text-zinc-300">
@@ -100,46 +107,89 @@
 
       <!-- CTA Nav Button -->
       <div class="flex items-center gap-3">
-        <a href="cadastroLogin.html" class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold uppercase tracking-wider text-xs px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-red-950/60 transition-all duration-300 flex items-center gap-2">
+
+        <a href="cadastroLogin.html"
+          class="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-bold uppercase tracking-wider text-xs px-3 sm:px-5 py-2.5 sm:py-3 rounded-xl shadow-lg shadow-red-950/60 transition-all duration-300 flex items-center gap-2">
+
           <i class="fa-regular fa-calendar-check text-yellow-400 text-sm sm:text-base"></i>
+
           <span class="hidden sm:inline">Agendar Horário</span>
           <span class="sm:hidden">Agendar</span>
+
         </a>
 
         <!-- Mobile Menu Toggle Button -->
-        <button id="mobileMenuBtn" onclick="toggleMobileMenu()" class="lg:hidden p-2 rounded-xl border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-900 transition">
+        <button id="mobileMenuBtn" onclick="toggleMobileMenu()"
+          class="lg:hidden p-2 rounded-xl border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-900 transition">
+
           <i class="fa-solid fa-bars text-lg" id="menuIcon"></i>
+
         </button>
+
       </div>
 
     </div>
 
     <!-- Mobile Dropdown Menu -->
-    <div id="mobileMenu" class="hidden lg:hidden border-b border-zinc-800 bg-brand-dark px-6 py-5 space-y-3">
-      <a href="#home" onclick="toggleMobileMenu()" class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">Início</a>
-      <a href="#servicos" onclick="toggleMobileMenu()" class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">Serviços & Preços</a>
-      <a href="#equipe" onclick="toggleMobileMenu()" class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">Barbeiro</a>
-      <a href="#diferenciais" onclick="toggleMobileMenu()" class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">Diferenciais</a>
-      <a href="#localizacao" onclick="toggleMobileMenu()" class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">Localização</a>
+    <div id="mobileMenu"
+      class="hidden lg:hidden border-b border-zinc-800 bg-brand-dark px-6 py-5 space-y-3">
+
+      <a href="#home" onclick="toggleMobileMenu()"
+        class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">
+        Início
+      </a>
+
+      <a href="#servicos" onclick="toggleMobileMenu()"
+        class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">
+        Serviços & Preços
+      </a>
+
+      <a href="#equipe" onclick="toggleMobileMenu()"
+        class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">
+        Barbeiro
+      </a>
+
+      <a href="#diferenciais" onclick="toggleMobileMenu()"
+        class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">
+        Diferenciais
+      </a>
+
+      <a href="#localizacao" onclick="toggleMobileMenu()"
+        class="block text-zinc-200 font-semibold uppercase text-xs hover:text-red-500 py-1.5">
+        Localização
+      </a>
+
     </div>
+
   </header>
 
-  <section id="home" class="relative py-12 sm:py-20 lg:py-24 bg-gradient-to-b from-brand-black via-zinc-950 to-brand-dark overflow-hidden">
-    
+  <section id="home"
+    class="relative py-12 sm:py-20 lg:py-24 bg-gradient-to-b from-brand-black via-zinc-950 to-brand-dark overflow-hidden">
+
     <!-- Decorative background lighting -->
     <div class="absolute -top-40 -right-40 w-80 h-80 bg-red-600/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
-      
+
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-yellow-500/30 bg-yellow-500/5 backdrop-blur-md mb-6">
+
         <span class="text-yellow-500 text-[10px]">✦</span>
-        <span class="text-yellow-500 text-[11px] font-bold uppercase tracking-[0.15em]">São Caetano de Odivelas - PA</span>
+
+        <span class="text-yellow-500 text-[11px] font-bold uppercase tracking-[0.15em]">
+          São Caetano de Odivelas - PA
+        </span>
+
       </div>
 
       <h1 class="font-title text-3xl sm:text-5xl md:text-6xl font-black uppercase tracking-tight text-white leading-tight mb-6">
+
         Estilo, Tradição <br class="hidden sm:inline"/>
-        <span class="text-zinc-400 font-light">&amp; Respeito ao</span> <br class="sm:hidden"/>
+
+        <span class="text-zinc-400 font-light">&amp; Respeito ao</span>
+        <br class="sm:hidden"/>
+
         <span class="text-gradient-red">Seu Corte</span>
+
       </h1>
 
       <p class="text-zinc-400 text-sm sm:text-base max-w-xl mx-auto font-normal leading-relaxed mb-8">
@@ -148,265 +198,459 @@
 
       <!-- Action Buttons -->
       <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto">
-        <a href="cadastroLogin.html" class="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold uppercase tracking-widest text-xs px-8 py-4 rounded-xl shadow-xl shadow-red-950/80 transition-all duration-300 flex items-center justify-center gap-2">
+
+        <a href="cadastroLogin.html"
+          class="w-full sm:w-auto bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white font-extrabold uppercase tracking-widest text-xs px-8 py-4 rounded-xl shadow-xl shadow-red-950/80 transition-all duration-300 flex items-center justify-center gap-2">
+
           <span>Agende Seu Horário</span>
+
           <i class="fa-solid fa-arrow-right text-yellow-400"></i>
+
         </a>
 
-        <a href="#servicos" class="w-full sm:w-auto bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition duration-300 flex items-center justify-center gap-2">
+        <a href="#servicos"
+          class="w-full sm:w-auto bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-white font-bold uppercase tracking-widest text-xs px-8 py-4 rounded-xl transition duration-300 flex items-center justify-center gap-2">
+
           <span>Ver Serviços</span>
+
         </a>
+
       </div>
 
     </div>
+
   </section>
 
   <section id="servicos" class="py-16 sm:py-24 bg-brand-dark border-t border-zinc-800/80">
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <!-- Section Header -->
       <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16 space-y-3">
+
         <span class="text-yellow-500 text-[11px] uppercase font-bold tracking-[0.25em] border border-yellow-500/30 px-3.5 py-1 rounded-full bg-yellow-500/5">
           ✦ Tabela de Serviços
         </span>
+
         <h2 class="font-title text-2xl sm:text-4xl font-extrabold uppercase text-white tracking-tight">
           Nossos <span class="text-gradient-red">Cortes &amp; Serviços</span>
         </h2>
+
         <p class="text-zinc-400 text-xs sm:text-sm">
           Selecione o corte ideal para valorizar seu estilo e agende diretamente online.
         </p>
+
       </div>
 
-      <!-- Services Grid: 1 col on mobile, 2 col on tablet, 3 col on desktop -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-        
+      <!-- Services Grid: 2 col on mobile, 3 col on desktop -->
+      <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+
         <!-- Degradê -->
         <div class="bg-brand-card border border-zinc-800 hover:border-red-600/50 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="degrade.jpg" onerror="this.src='https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=600'" alt="Degradê" class="w-full h-full object-cover">
+
+              <img src="degrade.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1622286342621-4bd786c2447c?auto=format&fit=crop&q=80&w=600'"
+                alt="Degradê"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">Degradê</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">
+                Degradê
+              </h3>
+
               <span class="font-bold text-lg text-yellow-500"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Corte moderno com acabamento preciso e transição perfeita no degradê.
             </p>
+
           </div>
-          <a href="cadastroLogin.html" class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
+
+          <a href="cadastroLogin.html"
+            class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
             Agendar Horário
           </a>
+
         </div>
 
         <!-- Navalhado -->
         <div class="bg-brand-card border border-zinc-800 hover:border-red-600/50 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="coetenavalhado.jpg" onerror="this.src='https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600'" alt="Navalhado" class="w-full h-full object-cover">
+
+              <img src="coetenavalhado.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1599351431202-1e0f0137899a?auto=format&fit=crop&q=80&w=600'"
+                alt="Navalhado"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">Navalhado</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">
+                Navalhado
+              </h3>
+
               <span class="font-bold text-lg text-yellow-500"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Acabamento refinado e bem rasteiro feito na lâmina navalha.
             </p>
+
           </div>
-          <a href="cadastroLogin.html" class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
+
+          <a href="cadastroLogin.html"
+            class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
             Agendar Horário
           </a>
+
         </div>
 
         <!-- Barba -->
         <div class="bg-brand-card border border-zinc-800 hover:border-red-600/50 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="barba1.jpg" onerror="this.src='https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=600'" alt="Barba" class="w-full h-full object-cover">
+
+              <img src="barba1.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80&w=600'"
+                alt="Barba"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">Barba</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">
+                Barba
+              </h3>
+
               <span class="font-bold text-lg text-yellow-500"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Modelagem profissional, alinhamento de contornos e toalha.
             </p>
+
           </div>
-          <a href="barbearia.html" class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
+
+          <a href="barbearia.html"
+            class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
             Agendar Horário
           </a>
+
         </div>
 
         <!-- Social -->
         <div class="bg-brand-card border border-zinc-800 hover:border-red-600/50 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="social.jpg" onerror="this.src='https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600'" alt="Social" class="w-full h-full object-cover">
+
+              <img src="social.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600'"
+                alt="Social"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">Social</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">
+                Social
+              </h3>
+
               <span class="font-bold text-lg text-yellow-500"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Corte tradicional e elegante para qualquer ocasião do dia a dia.
             </p>
+
           </div>
-          <a href="cadastroLogin.html" class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
+
+          <a href="cadastroLogin.html"
+            class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
             Agendar Horário
           </a>
+
         </div>
 
         <!-- Sobrancelha -->
         <div class="bg-brand-card border border-zinc-800 hover:border-red-600/50 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="sobrancelha.jpg" onerror="this.src='https://images.unsplash.com/photo-1517832606589-71574620396d?auto=format&fit=crop&q=80&w=600'" alt="Sobrancelha" class="w-full h-full object-cover">
+
+              <img src="sobrancelha.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1517832606589-71574620396d?auto=format&fit=crop&q=80&w=600'"
+                alt="Sobrancelha"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">Sobrancelha</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase">
+                Sobrancelha
+              </h3>
+
               <span class="font-bold text-lg text-yellow-500"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Acabamento discreto, alinhado e moderno com navalha.
             </p>
+
           </div>
-          <a href="cadastroLogin.html" class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
+
+          <a href="cadastroLogin.html"
+            class="w-full bg-zinc-900 hover:bg-red-600 text-zinc-300 hover:text-white font-bold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block border border-zinc-800">
             Agendar Horário
           </a>
+
         </div>
 
         <!-- Corte + Barba -->
         <div class="bg-brand-card border border-red-600/60 rounded-2xl p-4 sm:p-5 transition duration-300 flex flex-col justify-between">
+
           <div>
+
             <div class="h-40 sm:h-44 rounded-xl overflow-hidden mb-4 border border-zinc-800/80">
-              <img src="barba.jpg" onerror="this.src='https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600'" alt="Corte + Barba" class="w-full h-full object-cover">
+
+              <img src="barba.jpg"
+                onerror="this.src='https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80&w=600'"
+                alt="Corte + Barba"
+                class="w-full h-full object-cover">
+
             </div>
+
             <div class="flex justify-between items-start mb-2">
-              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase text-gradient-red">Corte + Barba</h3>
+
+              <h3 class="font-title font-bold text-base sm:text-lg text-white uppercase text-gradient-red">
+                Corte + Barba
+              </h3>
+
               <span class="font-bold text-lg text-yellow-400"></span>
+
             </div>
+
             <p class="text-zinc-400 text-xs leading-relaxed mb-6">
               Pacote completo para cabelo e barba com atendimento de excelência.
             </p>
+
           </div>
-          <a href="cadastroLogin.html" class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block shadow-lg shadow-red-950/60">
+
+          <a href="cadastroLogin.html"
+            class="w-full bg-red-600 hover:bg-red-700 text-white font-extrabold uppercase text-xs py-3 rounded-xl transition duration-300 text-center block shadow-lg shadow-red-950/60">
             Agendar Horário
           </a>
+
         </div>
 
       </div>
 
     </div>
+
   </section>
 
   <section id="equipe" class="py-16 sm:py-20 bg-brand-black">
+
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <div class="bg-brand-card border border-zinc-800 rounded-2xl p-6 sm:p-8 flex flex-col sm:flex-row items-center gap-6">
-        
+
         <div class="w-24 h-24 sm:w-32 sm:h-32 rounded-full overflow-hidden border-2 border-yellow-500 shrink-0">
-          <img src="barbeiro.png" onerror="this.src='https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=400'" alt="HS Barbeiro" class="w-full h-full object-cover">
+
+          <img src="barbeiro.png"
+            onerror="this.src='https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80&w=400'"
+            alt="HS Barbeiro"
+            class="w-full h-full object-cover">
+
         </div>
 
         <div class="text-center sm:text-left space-y-2">
-          <span class="text-yellow-500 font-bold text-xs uppercase tracking-widest">Profissional Principal</span>
-          <h3 class="font-title font-black text-2xl uppercase text-white">HS Barbeiro</h3>
+
+          <span class="text-yellow-500 font-bold text-xs uppercase tracking-widest">
+            Profissional Principal
+          </span>
+
+          <h3 class="font-title font-black text-2xl uppercase text-white">
+            HS Barbeiro
+          </h3>
+
           <p class="text-zinc-400 text-xs sm:text-sm leading-relaxed">
             Especialista em degradês, barba alinhada e cortes masculinos em São Caetano de Odivelas. Atendimento pontual e dedicado ao seu estilo.
           </p>
+
           <div class="pt-2">
-            <a href="cadastroLogin.html " class="inline-block bg-zinc-900 hover:bg-red-600 text-zinc-200 hover:text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl border border-zinc-800 transition">
+
+            <a href="cadastroLogin.html "
+              class="inline-block bg-zinc-900 hover:bg-red-600 text-zinc-200 hover:text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 rounded-xl border border-zinc-800 transition">
               Agendar com HS Barbeiro
             </a>
+
           </div>
+
         </div>
 
       </div>
 
     </div>
+
   </section>
 
-  <section id="diferenciais" class="py-16 sm:py-20 bg-brand-dark border-t border-b border-zinc-800/80">
+  <section id="diferenciais"
+    class="py-16 sm:py-20 bg-brand-dark border-t border-b border-zinc-800/80">
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <div class="text-center max-w-2xl mx-auto mb-12 space-y-3">
+
         <span class="text-yellow-500 text-[11px] uppercase font-bold tracking-[0.25em] border border-yellow-500/30 px-3.5 py-1 rounded-full bg-yellow-500/5">
           ✦ Experiência Odivelas
         </span>
+
         <h2 class="font-title text-2xl sm:text-4xl font-extrabold uppercase text-white tracking-tight">
           Sinta-se em <span class="text-gradient-gold">Casa</span>
         </h2>
+
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center">
-        
+
         <!-- Differencial 1: Bebidas & Chopp -->
         <div class="bg-brand-card p-6 rounded-2xl border border-zinc-800 space-y-3">
+
           <div class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-500 text-xl mx-auto">
             <i class="fa-solid fa-beer-mug-empty"></i>
           </div>
-          <h3 class="font-title font-bold text-base text-white uppercase">Bebidas &amp; Chopp Gelado</h3>
+
+          <h3 class="font-title font-bold text-base text-white uppercase">
+            Bebidas &amp; Chopp Gelado
+          </h3>
+
           <p class="text-zinc-400 text-xs leading-relaxed">
             Aproveite uma bebida trincando de gelada enquanto aguarda ou realiza seu atendimento.
           </p>
+
         </div>
 
         <!-- Differencial 2: Boa Música & Climatização -->
         <div class="bg-brand-card p-6 rounded-2xl border border-zinc-800 space-y-3">
+
           <div class="w-12 h-12 rounded-xl bg-red-600/10 border border-red-600/30 flex items-center justify-center text-red-500 text-xl mx-auto">
             <i class="fa-solid fa-music"></i>
           </div>
-          <h3 class="font-title font-bold text-base text-white uppercase">Boa Música &amp; Ar-Condicionado</h3>
+
+          <h3 class="font-title font-bold text-base text-white uppercase">
+            Boa Música &amp; Ar-Condicionado
+          </h3>
+
           <p class="text-zinc-400 text-xs leading-relaxed">
             Playlist selecionada e ambiente 100% climatizado para o seu total conforto.
           </p>
+
         </div>
 
         <!-- Differencial 3: Pontualidade -->
         <div class="bg-brand-card p-6 rounded-2xl border border-zinc-800 space-y-3">
+
           <div class="w-12 h-12 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-500 text-xl mx-auto">
             <i class="fa-solid fa-calendar-check"></i>
           </div>
-          <h3 class="font-title font-bold text-base text-white uppercase">Atendimento Pontual</h3>
+
+          <h3 class="font-title font-bold text-base text-white uppercase">
+            Atendimento Pontual
+          </h3>
+
           <p class="text-zinc-400 text-xs leading-relaxed">
             Respeito ao seu tempo. Marque no site e seja atendido exatamente na hora escolhida.
           </p>
+
         </div>
 
       </div>
 
     </div>
+
   </section>
 
   <section id="localizacao" class="py-16 sm:py-20 bg-brand-black">
+
     <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      
+
       <div class="flex flex-col md:flex-row items-center justify-between gap-8 bg-zinc-950 border border-zinc-800 p-6 sm:p-10 rounded-2xl">
-        
+
         <div class="space-y-4 text-center md:text-left">
+
           <h2 class="font-title text-2xl sm:text-3xl font-black uppercase text-white">
             𝕺𝖉𝖎𝖛𝖊𝖑𝖆𝖘 <span class="text-yellow-500">𝕭𝖆𝖗𝖇𝖊𝖆𝖗𝖎𝖆</span>
           </h2>
+
           <div class="text-zinc-400 text-xs sm:text-sm space-y-1">
-            <p class="font-semibold text-white">📍 Av. Magalhães Barata - Bairro Umarizal</p>
-            <p>São Caetano de Odivelas - PA</p>
+
+            <p class="font-semibold text-white">
+              📍 Av. Magalhães Barata - Bairro Umarizal
+            </p>
+
+            <p>
+              São Caetano de Odivelas - PA
+            </p>
+
           </div>
-          <p class="text-zinc-500 text-xs uppercase tracking-widest pt-2">Arte • Estilo • Presença</p>
+
+          <p class="text-zinc-500 text-xs uppercase tracking-widest pt-2">
+            Arte • Estilo • Presença
+          </p>
+
         </div>
 
         <div class="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
-          <a href="https://maps.app.goo.gl/bqbvQHCXooT9B3aE9?g_st=iw" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-xl transition text-center flex items-center justify-center gap-2">
-            <i class="fa-solid fa-location-dot text-red-500"></i> Localização no Maps
+
+          <a href="https://maps.app.goo.gl/bqbvQHCXooT9B3aE9?g_st=iw"
+            target="_blank"
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-xl transition text-center flex items-center justify-center gap-2">
+
+            <i class="fa-solid fa-location-dot text-red-500"></i>
+            Localização no Maps
+
           </a>
 
-          <a href="https://instagram.com/odivelas_barbearia" target="_blank" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-xl transition text-center flex items-center justify-center gap-2">
-            <i class="fa-brands fa-instagram text-yellow-500"></i> @odivelas_barbearia
+          <a href="https://instagram.com/odivelas_barbearia"
+            target="_blank"
+            class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 text-xs font-bold uppercase tracking-wider py-3 px-5 rounded-xl transition text-center flex items-center justify-center gap-2">
+
+            <i class="fa-brands fa-instagram text-yellow-500"></i>
+            @odivelas_barbearia
+
           </a>
+
         </div>
 
       </div>
 
     </div>
+
   </section>
 
   <!-- Footer Bottom -->
@@ -415,21 +659,29 @@
   </footer>
 
   <script>
+
     /* Toggle Mobile Navigation Menu */
     function toggleMobileMenu() {
+
       const mobileMenu = document.getElementById('mobileMenu');
       const menuIcon = document.getElementById('menuIcon');
-      
+
       mobileMenu.classList.toggle('hidden');
-      
+
       if (mobileMenu.classList.contains('hidden')) {
+
         menuIcon.classList.remove('fa-xmark');
         menuIcon.classList.add('fa-bars');
+
       } else {
+
         menuIcon.classList.remove('fa-bars');
         menuIcon.classList.add('fa-xmark');
+
       }
+
     }
+
   </script>
 
 </body>
