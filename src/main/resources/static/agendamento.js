@@ -160,6 +160,10 @@ function selecionarDia(elemento, dataISO, textoExibicao) {
       .eq('data', dataISO)
       .neq('status', 'cancelado');
 
+      console.log('DATA SELECIONADA:', dataISO);
+console.log('AGENDAMENTOS DO DIA:', agendamentosDb);
+console.log('ERRO AGENDAMENTOS:', errAgendamentos);
+
     if (!errAgendamentos && agendamentosDb) {
       ocupadosNoDia = agendamentosDb.map(a => a.horario || a.hora);
       console.log('AGENDAMENTOS DO DIA:', agendamentosDb);
