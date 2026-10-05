@@ -76,9 +76,7 @@ function verificarSessao() {
 return agendamentoUserId === userId;
       });
 
-      if (filtrados.length > 0) {
-        meusAgendamentos = filtrados;
-      }
+      meusAgendamentos = filtrados;
     }
 
     const hoje = new Date().toISOString().split('T')[0];
