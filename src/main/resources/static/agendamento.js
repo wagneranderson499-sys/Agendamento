@@ -426,6 +426,9 @@ async function confirmarAgendamento() {
     return;
   }
 
+  // Abre uma aba imediatamente para evitar o bloqueio de pop-ups.
+  const abaWhatsApp = window.open('about:blank', '_blank');
+
   let user = null;
 
   try {
@@ -442,6 +445,8 @@ async function confirmarAgendamento() {
     usuarioLogado;
 
   if (!user && !usuarioLocal) {
+    if (abaWhatsApp) abaWhatsApp.close();
+
     alert(
       'Sua sessão expirou ou você não está logado. Por favor, faça login para agendar.'
     );
@@ -474,8 +479,7 @@ async function confirmarAgendamento() {
     email: user?.email || usuarioLocal?.email || 'cliente@odivelas.com'
   };
 
-  // Verifica novamente a disponibilidade imediatamente antes de gravar.
-  // Isso evita confirmar um horário que tenha sido ocupado após a seleção.
+  // Confere novamente a disponibilidade.
   try {
     const { data: agendamentosDb, error: erroAgendamentos } =
       await supabaseClient
@@ -515,6 +519,8 @@ async function confirmarAgendamento() {
     );
 
     if (conflitoAgendamento || conflitoBloqueio) {
+      if (abaWhatsApp) abaWhatsApp.close();
+
       alert(
         'Esse horário acabou de ficar indisponível. Escolha outro horário, por favor.'
       );
@@ -525,6 +531,8 @@ async function confirmarAgendamento() {
   } catch (err) {
     console.error('Erro ao validar disponibilidade:', err);
 
+    if (abaWhatsApp) abaWhatsApp.close();
+
     alert(
       'Não foi possível confirmar a disponibilidade. Tente novamente.'
     );
@@ -532,7 +540,7 @@ async function confirmarAgendamento() {
     return;
   }
 
-  // Grava no Supabase.
+  // Salva o agendamento no Supabase.
   try {
     const { error: erroSupa } = await supabaseClient
       .from('agendamentos')
@@ -551,11 +559,16 @@ async function confirmarAgendamento() {
 
     if (erroSupa) {
       console.error('Erro ao gravar no Supabase:', erroSupa.message);
+
+      if (abaWhatsApp) abaWhatsApp.close();
+
       alert('Não foi possível salvar o agendamento: ' + erroSupa.message);
       return;
     }
   } catch (err) {
     console.error('Erro de conexão ao salvar no Supabase:', err);
+
+    if (abaWhatsApp) abaWhatsApp.close();
 
     alert('Erro de conexão ao salvar o agendamento. Tente novamente.');
     return;
@@ -587,7 +600,7 @@ async function confirmarAgendamento() {
     JSON.stringify(agendamentosLocais)
   );
 
-  // Monta a mensagem do WhatsApp.
+  // Formata os dados para a mensagem.
   const partesData = dataSelecionada.split('-');
 
   const dataFormatada =
@@ -603,15 +616,28 @@ async function confirmarAgendamento() {
     `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
     `📅 *Data:* ${dataFormatada}\n` +
     `⏰ *Horário:* ${horarioSelecionado}\n` +
-    `💈 *Barbeiro:* ${barbeiroSelecionado}`;
+    `💈 *Barbeiro:* ${barbeiroSelecionado}\n\n` +
+    `✅ Para consultar seu agendamento, volte ao sistema ` +
+    `Odivelas Barbearia e acesse a página "Meus Agendamentos".`;
 
   const linkZap =
     `https://wa.me/${SEU_WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagemWhatsApp)}`;
 
-  // Redireciona para os agendamentos e tenta abrir o WhatsApp.
-  window.open(linkZap, '_blank');
+  // Abre o WhatsApp na aba preparada anteriormente.
+  if (abaWhatsApp) {
+    abaWhatsApp.location.href = linkZap;
+  } else {
+    // Alternativa caso o navegador tenha bloqueado a nova aba.
+    alert(
+      'Seu agendamento foi salvo! Se o WhatsApp não abrir automaticamente, ' +
+      'permita pop-ups para este site e tente novamente.'
+    );
+  }
+
+  // Retorna a página original ao histórico.
   window.location.href = 'meus-agendamentos.html';
 }
+
 
 // 11. BUSCA OS SERVIÇOS E PREÇOS DO SUPABASE
 
