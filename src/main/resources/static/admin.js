@@ -1,10 +1,13 @@
+
 /**
  * Arquivo: admin.js
  * Descrição: Painel Administrativo do Barbeiro - Odivelas Barbearia
- * Sincronização em Tempo Real via Supabase + localStorage Redundante
+ * Sincronização via Supabase + localStorage redundante
+ * Duração de cada agendamento: 40 minutos
  */
 
 const NUMERO_BARBEARIA = '5591985793959';
+
 const DB_KEYS = {
   USUARIO_LOGADO: 'odivelas_usuario_logado',
   AGENDAMENTOS: 'odivelas_agendamentos',
@@ -13,12 +16,57 @@ const DB_KEYS = {
   SERVICOS: 'odivelas_servicos'
 };
 
-const HORARIOS_PADRAO = [
-  '09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00',
-  '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', 
-  '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', 
-  '20:00', '20:30', '21:00'
-];
+const DURACAO_AGENDAMENTO_MINUTOS = 40;
+
+// Expediente: 09h às 12h e 14h às 22h.
+// O último horário de início é calculado para o serviço terminar
+// dentro do expediente.
+const HORARIOS_PADRAO = gerarHorariosPadrao();
+
+function gerarHorariosPadrao() {
+  const horarios = [];
+
+  const periodos = [
+    { inicio: '09:00', fim: '12:00' },
+    { inicio: '14:00', fim: '22:00' }
+  ];
+
+  periodos.forEach(periodo => {
+    let minutos = converterHoraParaMinutos(periodo.inicio);
+    const fim = converterHoraParaMinutos(periodo.fim);
+
+    while (minutos + DURACAO_AGENDAMENTO_MINUTOS <= fim) {
+      horarios.push(converterMinutosParaHora(minutos));
+      minutos += DURACAO_AGENDAMENTO_MINUTOS;
+    }
+  });
+
+  return horarios;
+}
+
+function converterHoraParaMinutos(hora) {
+  if (!hora || typeof hora !== 'string') return 0;
+
+  const partes = hora.split(':');
+  return Number(partes[0]) * 60 + Number(partes[1] || 0);
+}
+
+function converterMinutosParaHora(minutos) {
+  const horas = Math.floor(minutos / 60);
+  const restante = minutos % 60;
+
+  return `${String(horas).padStart(2, '0')}:${String(restante).padStart(2, '0')}`;
+}
+
+function horariosSeSobrepoem(horaA, duracaoA, horaB, duracaoB) {
+  const inicioA = converterHoraParaMinutos(horaA);
+  const inicioB = converterHoraParaMinutos(horaB);
+
+  const fimA = inicioA + duracaoA;
+  const fimB = inicioB + duracaoB;
+
+  return inicioA < fimB && inicioB < fimA;
+}
 
 const SERVICOS_PADRAO = [
   { nome: 'Degradê', preco: 20 },
@@ -39,8 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // 0. VERIFICA ACESSO ADMIN E DATA
+
 function verificarAcessoAdmin() {
-  const sessao = JSON.parse(localStorage.getItem(DB_KEYS.USUARIO_LOGADO) || '{}');
+  const sessao = JSON.parse(
+    localStorage.getItem(DB_KEYS.USUARIO_LOGADO) || '{}'
+  );
+
   if (sessao.tipo !== 'admin' && sessao.email !== 'admin@odivelas.com') {
     alert('Acesso restrito ao Administrador.');
     window.location.href = 'login.html';
@@ -49,12 +101,19 @@ function verificarAcessoAdmin() {
 
 function inicializarDataHoje() {
   const inputData = document.getElementById('adminDataFiltro');
+
   if (inputData && !inputData.value) {
-    inputData.value = new Date().toISOString().split('T')[0];
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, '0');
+    const dia = String(agora.getDate()).padStart(2, '0');
+
+    inputData.value = `${ano}-${mes}-${dia}`;
   }
 }
 
 // 1. NAVEGAÇÃO DE ABAS
+
 function trocarAba(idAba, elementoBtn) {
   ['abaHorarios', 'abaAgendamentos', 'abaServicos'].forEach(aba => {
     const el = document.getElementById(aba);
@@ -78,74 +137,113 @@ function trocarAba(idAba, elementoBtn) {
     carregarGerenciadorServicos();
   }
 }
-// GRADE DE HORÁRIOS ADMIN
+
+// 2. GRADE DE HORÁRIOS DO ADMIN
+
 async function carregarGradeHorariosAdmin(dataFiltro) {
-  const container = document.getElementById('gridHorariosAdmin') || document.getElementById('gradeHorariosAdmin');
+  const container =
+    document.getElementById('gridHorariosAdmin') ||
+    document.getElementById('gradeHorariosAdmin');
+
   if (!container) return;
 
   const inputData = document.getElementById('adminDataFiltro');
-  const dataAlvo = dataFiltro || inputData?.value || new Date().toISOString().split('T')[0];
+  const dataAlvo =
+    dataFiltro ||
+    inputData?.value ||
+    (() => {
+      const agora = new Date();
+      return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+    })();
+
+  container.innerHTML =
+    '<p class="text-xs text-zinc-500 col-span-full text-center py-4">Carregando horários...</p>';
 
   try {
-    // 1. Ocupados
-    const { data: agendamentosDb } = await supabaseClient
-      .from('agendamentos')
-      .select('horario, cliente_nome, status')
-      .eq('data', dataAlvo)
-      .neq('status', 'cancelado');
+    const { data: agendamentosDb, error: erroAgendamentos } =
+      await supabaseClient
+        .from('agendamentos')
+        .select('id, horario, cliente_nome, status')
+        .eq('data', dataAlvo)
+        .neq('status', 'cancelado');
 
-    const ocupadosMap = {};
-    if (agendamentosDb) {
-      agendamentosDb.forEach(a => {
-        ocupadosMap[a.horario] = a.cliente_nome || 'Ocupado';
-      });
-    }
+    if (erroAgendamentos) throw erroAgendamentos;
 
-    // 2. Bloqueados
-    const { data: bloqueiosDb } = await supabaseClient
-      .from('bloqueios')
-      .select('horario')
-      .eq('data', dataAlvo);
+    const { data: bloqueiosDb, error: erroBloqueios } =
+      await supabaseClient
+        .from('bloqueios')
+        .select('horario')
+        .eq('data', dataAlvo);
 
-    const bloqueadosLista = bloqueiosDb ? bloqueiosDb.map(b => b.horario) : [];
+    if (erroBloqueios) throw erroBloqueios;
+
+    const agendamentos = agendamentosDb || [];
+    const bloqueios = bloqueiosDb || [];
 
     container.innerHTML = '';
 
     HORARIOS_PADRAO.forEach(horario => {
-      const clienteNome = ocupadosMap[horario];
-      const estaBloqueado = bloqueadosLista.includes(horario);
+      const agendamentoSobreposto = agendamentos.find(a =>
+        a.horario &&
+        horariosSeSobrepoem(
+          horario,
+          DURACAO_AGENDAMENTO_MINUTOS,
+          a.horario,
+          DURACAO_AGENDAMENTO_MINUTOS
+        )
+      );
+
+      const bloqueioSobreposto = bloqueios.find(b =>
+        b.horario &&
+        horariosSeSobrepoem(
+          horario,
+          DURACAO_AGENDAMENTO_MINUTOS,
+          b.horario,
+          DURACAO_AGENDAMENTO_MINUTOS
+        )
+      );
 
       const div = document.createElement('div');
 
-      if (clienteNome) {
-        // --- OCUPADO (AMARELO) ---
-        div.className = 'p-3 rounded-2xl bg-amber-500/20 border-2 border-amber-500/80 text-amber-300 flex flex-col justify-between shadow-lg shadow-amber-500/10 min-h-[85px]';
+      if (agendamentoSobreposto) {
+        const clienteNome = agendamentoSobreposto.cliente_nome || 'Ocupado';
+
+        div.className =
+          'p-3 rounded-2xl bg-amber-500/20 border-2 border-amber-500/80 text-amber-300 flex flex-col justify-between shadow-lg shadow-amber-500/10 min-h-[85px]';
+
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
             <span class="text-[10px] font-extrabold uppercase bg-amber-500 text-black px-1.5 py-0.5 rounded-md">Ocupado</span>
           </div>
           <div class="mt-1 w-full">
-            <p class="text-xs font-bold text-amber-200 truncate w-full" title="${clienteNome}">${clienteNome}</p>
+            <p class="text-xs font-bold text-amber-200 truncate w-full"
+               title="${escaparHTML(clienteNome)}">${escaparHTML(clienteNome)}</p>
           </div>
         `;
-      } else if (estaBloqueado) {
-        // --- BLOQUEADO (VERMELHO) ---
-        div.className = 'p-3 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-300 flex flex-col justify-between shadow-lg shadow-red-500/20 transition active:scale-95 cursor-pointer min-h-[85px]';
-        div.onclick = () => alternarBloqueioHorario(dataAlvo, horario, true);
+      } else if (bloqueioSobreposto) {
+        div.className =
+          'p-3 rounded-2xl bg-red-950/80 border-2 border-red-500 text-red-300 flex flex-col justify-between shadow-lg shadow-red-500/20 transition active:scale-95 cursor-pointer min-h-[85px]';
+
+        div.onclick = () =>
+          alternarBloqueioHorario(dataAlvo, bloqueioSobreposto.horario, true);
+
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
             <span class="text-[10px] font-extrabold uppercase bg-red-600 text-white px-1.5 py-0.5 rounded-md shadow">Bloqueado</span>
           </div>
           <span class="mt-1 text-xs font-bold text-red-400 hover:text-white underline text-left">
-            Clique p/ Desbloquear
+            Bloqueio: ${bloqueioSobreposto.horario}
           </span>
         `;
       } else {
-        // --- LIVRE (VERDE) ---
-        div.className = 'p-3 rounded-2xl bg-emerald-950/50 border-2 border-emerald-500/70 text-emerald-300 flex flex-col justify-between shadow-lg shadow-emerald-500/10 transition active:scale-95 cursor-pointer min-h-[85px]';
-        div.onclick = () => alternarBloqueioHorario(dataAlvo, horario, false);
+        div.className =
+          'p-3 rounded-2xl bg-emerald-950/50 border-2 border-emerald-500/70 text-emerald-300 flex flex-col justify-between shadow-lg shadow-emerald-500/10 transition active:scale-95 cursor-pointer min-h-[85px]';
+
+        div.onclick = () =>
+          alternarBloqueioHorario(dataAlvo, horario, false);
+
         div.innerHTML = `
           <div class="flex justify-between items-center w-full">
             <span class="font-black text-base sm:text-lg text-white">${horario}</span>
@@ -159,13 +257,26 @@ async function carregarGradeHorariosAdmin(dataFiltro) {
 
       container.appendChild(div);
     });
-
   } catch (err) {
     console.error('Erro ao carregar grade admin:', err);
+
+    container.innerHTML =
+      '<p class="text-xs text-red-400 col-span-full text-center py-4">Não foi possível carregar os horários.</p>';
   }
 }
 
+function escaparHTML(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[caractere]);
+}
+
 // FUNÇÃO DE ALTERNAR BLOQUEIO
+
 async function alternarBloqueioHorario(data, horario, jaBloqueado) {
   try {
     if (jaBloqueado) {
@@ -176,38 +287,93 @@ async function alternarBloqueioHorario(data, horario, jaBloqueado) {
         .eq('horario', horario);
 
       if (error) {
-        alert("Erro ao desbloquear: " + error.message);
+        alert('Erro ao desbloquear: ' + error.message);
         return;
       }
     } else {
+      // Não permite bloquear um horário que já tenha um agendamento
+      // dentro do intervalo de 40 minutos.
+      const { data: agendamentos, error: erroAgendamentos } =
+        await supabaseClient
+          .from('agendamentos')
+          .select('horario, cliente_nome, status')
+          .eq('data', data)
+          .neq('status', 'cancelado');
+
+      if (erroAgendamentos) {
+        alert('Não foi possível verificar os agendamentos existentes.');
+        return;
+      }
+
+      const conflito = (agendamentos || []).some(a =>
+        a.horario &&
+        horariosSeSobrepoem(
+          horario,
+          DURACAO_AGENDAMENTO_MINUTOS,
+          a.horario,
+          DURACAO_AGENDAMENTO_MINUTOS
+        )
+      );
+
+      if (conflito) {
+        alert('Esse horário coincide com um agendamento existente e não pode ser bloqueado.');
+        return;
+      }
+
+      const { data: bloqueiosExistentes, error: erroBuscaBloqueios } =
+        await supabaseClient
+          .from('bloqueios')
+          .select('horario')
+          .eq('data', data);
+
+      if (erroBuscaBloqueios) {
+        alert('Não foi possível verificar os bloqueios existentes.');
+        return;
+      }
+
+      const jaExisteConflito = (bloqueiosExistentes || []).some(b =>
+        b.horario &&
+        horariosSeSobrepoem(
+          horario,
+          DURACAO_AGENDAMENTO_MINUTOS,
+          b.horario,
+          DURACAO_AGENDAMENTO_MINUTOS
+        )
+      );
+
+      if (jaExisteConflito) {
+        alert('Esse horário já está dentro de outro bloqueio.');
+        return;
+      }
+
       const { error } = await supabaseClient
         .from('bloqueios')
-        .insert([{ data: data, horario: horario }]);
+        .insert([{ data, horario }]);
 
       if (error) {
-        alert("Erro ao bloquear no banco: " + error.message);
+        alert('Erro ao bloquear no banco: ' + error.message);
         return;
       }
     }
 
-    // Recarrega a grade e os cards do topo imediatamente
     await carregarGradeHorariosAdmin(data);
     await atualizarIndicadoresTopo();
-
   } catch (err) {
-    console.error("Erro ao alternar bloqueio:", err);
+    console.error('Erro ao alternar bloqueio:', err);
+    alert('Ocorreu um erro ao alterar o bloqueio.');
   }
 }
+
 // 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO
-// 3. TABELA DE AGENDAMENTOS, CONCLUSÃO E CANCELAMENTO (ADMIN)
+
 async function carregarTabelaAgendamentosAdmin() {
   const tabela = document.getElementById('tabelaAgendamentosAdmin');
   if (!tabela) return;
 
-  tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-zinc-500">Buscando agendamentos...</td></tr>`;
+  tabela.innerHTML =
+    '<tr><td colspan="6" class="text-center py-6 text-zinc-500">Buscando agendamentos...</td></tr>';
 
   try {
-    // Busca do Supabase apenas os agendamentos ativos/pendentes
     const { data: agendamentosDb, error } = await supabaseClient
       .from('agendamentos')
       .select('*')
@@ -216,54 +382,72 @@ async function carregarTabelaAgendamentosAdmin() {
       .order('data', { ascending: true })
       .order('horario', { ascending: true });
 
-    if (error) console.error('Erro ao buscar do Supabase:', error.message);
+    if (error) throw error;
 
-    let agendamentos = agendamentosDb || [];
-
-    // Busca do localStorage apenas agendamentos locais pendentes (que ainda não foram enviados para o Supabase)
- 
-    ;
+    const agendamentos = agendamentosDb || [];
 
     if (agendamentos.length === 0) {
-      tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-zinc-500">Nenhum agendamento pendente encontrado.</td></tr>`;
+      tabela.innerHTML =
+        '<tr><td colspan="6" class="text-center py-6 text-zinc-500">Nenhum agendamento pendente encontrado.</td></tr>';
       return;
     }
 
     tabela.innerHTML = agendamentos.map(a => {
       const horaExibicao = a.horario || a.hora || '--:--';
-      const partesData = a.data ? a.data.split('-') : ['00', '00', '0000'];
-      const dataFormatada = partesData.length === 3 ? `${partesData[2]}/${partesData[1]}` : a.data;
+      const partesData = a.data ? a.data.split('-') : ['0000', '00', '00'];
+      const dataFormatada =
+        partesData.length === 3
+          ? `${partesData[2]}/${partesData[1]}`
+          : a.data;
 
       const nomeCliente = a.cliente_nome || a.clienteNome || 'Cliente';
       const emailCliente = a.cliente_email || a.clienteEmail || a.email || '';
-      const telefoneCliente = a.cliente_telefone || a.clienteTelefone || a.telefone || 'N/A';
+      const telefoneCliente =
+        a.cliente_telefone || a.clienteTelefone || a.telefone || 'N/A';
       const nomeServico = a.servico_nome || a.servico || 'Corte';
       const valorPreco = a.preco || a.valor || 0;
 
       return `
         <tr class="hover:bg-zinc-900/50 transition border-b border-zinc-800/40">
-          <td class="py-3 px-2 font-black text-yellow-500">${horaExibicao} <span class="block text-[10px] text-zinc-400 font-normal">${dataFormatada}</span></td>
-          <td class="py-3 px-2 font-bold text-white">${nomeCliente} <span class="block text-xs font-normal text-zinc-400">${emailCliente}</span></td>
-          <td class="py-3 px-2 text-zinc-300 font-medium">${telefoneCliente}</td>
-          <td class="py-3 px-2 font-medium text-zinc-200">${nomeServico}</td>
-          <td class="py-3 px-2 font-bold text-green-400">R$ ${Number(valorPreco).toFixed(2).replace('.', ',')}</td>
-          <td class="py-3 px-2 flex gap-2">
-            <button onclick="concluirCorte('${a.id}')" class="bg-green-600/20 text-green-400 hover:bg-green-600 hover:text-white border border-green-600/30 px-2.5 py-1 rounded-lg text-xs font-bold transition">Concluir</button>
-            <button onclick="cancelarAgendamentoAdmin('${a.id}')" class="bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-2.5 py-1 rounded-lg text-xs font-bold transition">Cancelar</button>
+          <td class="py-3 px-2 font-black text-yellow-500">
+            ${escaparHTML(horaExibicao)}
+            <span class="block text-[10px] text-zinc-400 font-normal">${escaparHTML(dataFormatada)}</span>
+          </td>
+          <td class="py-3 px-2 font-bold text-white">
+            ${escaparHTML(nomeCliente)}
+            <span class="block text-xs font-normal text-zinc-400">${escaparHTML(emailCliente)}</span>
+          </td>
+          <td class="py-3 px-2 text-zinc-300 font-medium">${escaparHTML(telefoneCliente)}</td>
+          <td class="py-3 px-2 font-medium text-zinc-200">${escaparHTML(nomeServico)}</td>
+          <td class="py-3 px-2 font-bold text-green-400">
+            R$ ${Number(valorPreco).toFixed(2).replace('.', ',')}
+          </td>
+          <td class="py-3 px-2">
+            <div class="flex gap-2">
+              <button onclick="concluirCorte('${a.id}')"
+                class="bg-green-600/20 text-green-400 hover:bg-green-600 hover:text-white border border-green-600/30 px-2.5 py-1 rounded-lg text-xs font-bold transition">
+                Concluir
+              </button>
+              <button onclick="cancelarAgendamentoAdmin('${a.id}')"
+                class="bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/30 px-2.5 py-1 rounded-lg text-xs font-bold transition">
+                Cancelar
+              </button>
+            </div>
           </td>
         </tr>
       `;
     }).join('');
-
   } catch (err) {
-    console.error('Erro na renderização:', err);
-    tabela.innerHTML = `<tr><td colspan="6" class="text-center py-6 text-red-400">Erro ao carregar agendamentos.</td></tr>`;
+    console.error('Erro ao carregar agendamentos:', err);
+    tabela.innerHTML =
+      '<tr><td colspan="6" class="text-center py-6 text-red-400">Erro ao carregar agendamentos.</td></tr>';
   }
-}async function concluirCorte(idAgendamento) {
+}
+
+async function concluirCorte(idAgendamento) {
   if (!confirm('Deseja marcar este agendamento como concluído?')) return;
 
   try {
-    // 1. Atualiza apenas o status no Supabase para 'concluido'
     const { error } = await supabaseClient
       .from('agendamentos')
       .update({ status: 'concluido' })
@@ -275,10 +459,14 @@ async function carregarTabelaAgendamentosAdmin() {
       return;
     }
 
-    // 2. Atualiza a cópia local no localStorage
-    let agendamentos = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
-    const index = agendamentos.findIndex(a => String(a.id) === String(idAgendamento));
-    
+    const agendamentos = JSON.parse(
+      localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]'
+    );
+
+    const index = agendamentos.findIndex(
+      a => String(a.id) === String(idAgendamento)
+    );
+
     if (index !== -1) {
       agendamentos[index].status = 'concluido';
       localStorage.setItem(DB_KEYS.AGENDAMENTOS, JSON.stringify(agendamentos));
@@ -286,22 +474,15 @@ async function carregarTabelaAgendamentosAdmin() {
 
     alert('Corte concluído com sucesso!');
 
-    // 3. Recarrega as listas do Admin (o agendamento sai dos pendentes)
-    if (typeof carregarTabelaAgendamentosAdmin === 'function') {
-      await carregarTabelaAgendamentosAdmin();
-    }
-    if (typeof carregarGradeHorariosAdmin === 'function') {
-      await carregarGradeHorariosAdmin();
-    }
-    if (typeof atualizarIndicadoresTopo === 'function') {
-      await atualizarIndicadoresTopo();
-    }
-
+    await carregarTabelaAgendamentosAdmin();
+    await carregarGradeHorariosAdmin();
+    await atualizarIndicadoresTopo();
   } catch (err) {
     console.error('Erro na função concluirCorte:', err);
     alert('Ocorreu um erro ao concluir o corte.');
   }
 }
+
 async function cancelarAgendamentoAdmin(idAgendamento) {
   if (!confirm('Tem certeza que deseja cancelar este agendamento?')) return;
 
@@ -311,10 +492,19 @@ async function cancelarAgendamentoAdmin(idAgendamento) {
       .update({ status: 'cancelado' })
       .eq('id', idAgendamento);
 
-    if (error) console.error('Erro ao cancelar no Supabase:', error.message);
+    if (error) {
+      console.error('Erro ao cancelar no Supabase:', error.message);
+      alert('Erro ao cancelar o agendamento: ' + error.message);
+      return;
+    }
 
-    let agendamentos = JSON.parse(localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]');
-    const index = agendamentos.findIndex(a => String(a.id) === String(idAgendamento));
+    const agendamentos = JSON.parse(
+      localStorage.getItem(DB_KEYS.AGENDAMENTOS) || '[]'
+    );
+
+    const index = agendamentos.findIndex(
+      a => String(a.id) === String(idAgendamento)
+    );
 
     if (index !== -1) {
       agendamentos[index].status = 'cancelado';
@@ -322,15 +512,18 @@ async function cancelarAgendamentoAdmin(idAgendamento) {
     }
 
     alert('Agendamento cancelado!');
+
     await carregarTabelaAgendamentosAdmin();
     await carregarGradeHorariosAdmin();
     await atualizarIndicadoresTopo();
   } catch (err) {
     console.error('Erro ao cancelar agendamento:', err);
+    alert('Ocorreu um erro ao cancelar o agendamento.');
   }
 }
 
 // 4. GERENCIADOR DE SERVIÇOS E ALTERAÇÃO DE PREÇOS
+
 async function carregarGerenciadorServicos() {
   const container = document.getElementById('listaServicosAdmin');
   if (!container) return;
@@ -347,21 +540,24 @@ async function carregarGerenciadorServicos() {
       servicos = servicosSupa;
       localStorage.setItem(DB_KEYS.SERVICOS, JSON.stringify(servicos));
     } else {
-      servicos = JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || SERVICOS_PADRAO;
+      servicos =
+        JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || SERVICOS_PADRAO;
     }
   } catch (err) {
     console.error('Erro ao conectar com Supabase:', err);
-    servicos = JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || SERVICOS_PADRAO;
+    servicos =
+      JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || SERVICOS_PADRAO;
   }
 
   container.innerHTML = servicos.map((s, idx) => `
     <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-xl">
-      <span class="font-bold text-sm text-white">${s.nome}</span>
+      <span class="font-bold text-sm text-white">${escaparHTML(s.nome)}</span>
       <div class="flex items-center gap-2">
         <span class="text-xs text-zinc-400">R$</span>
-        <input type="number" step="0.5" value="${s.preco}" id="precoServico_${idx}"
+        <input type="number" step="0.5" value="${Number(s.preco)}" id="precoServico_${idx}"
           class="w-20 bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1 text-sm text-yellow-500 font-bold outline-none focus:border-red-600">
-        <button onclick="salvarPrecoServico(${idx}, '${s.nome}')" class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded-lg font-bold transition">
+        <button onclick="salvarPrecoServico(${idx}, '${String(s.nome).replace(/'/g, "\\'")}')"
+          class="bg-red-600 hover:bg-red-500 text-white text-xs px-3 py-1 rounded-lg font-bold transition">
           Salvar
         </button>
       </div>
@@ -381,11 +577,10 @@ async function salvarPrecoServico(idx, nomeServico) {
   }
 
   try {
-    const { data, error } = await supabaseClient
+    const { error } = await supabaseClient
       .from('servicos')
       .update({ preco: novoPreco })
-      .ilike('nome', nomeServico)
-      .select();
+      .ilike('nome', nomeServico);
 
     if (error) {
       console.error('Erro ao salvar no Supabase:', error.message);
@@ -393,26 +588,38 @@ async function salvarPrecoServico(idx, nomeServico) {
       return;
     }
 
-    let servicosLocais = JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || [];
-    const indexLocal = servicosLocais.findIndex(s => s.nome.toLowerCase() === nomeServico.toLowerCase());
-    
+    const servicosLocais =
+      JSON.parse(localStorage.getItem(DB_KEYS.SERVICOS)) || [];
+
+    const indexLocal = servicosLocais.findIndex(
+      s => s.nome.toLowerCase() === nomeServico.toLowerCase()
+    );
+
     if (indexLocal !== -1) {
       servicosLocais[indexLocal].preco = novoPreco;
       localStorage.setItem(DB_KEYS.SERVICOS, JSON.stringify(servicosLocais));
     }
 
-    alert(`Preço do serviço "${nomeServico}" atualizado para R$ ${novoPreco.toFixed(2)} com sucesso!`);
-    await carregarGerenciadorServicos();
+    alert(
+      `Preço do serviço "${nomeServico}" atualizado para R$ ${novoPreco.toFixed(2)} com sucesso!`
+    );
 
+    await carregarGerenciadorServicos();
   } catch (err) {
     console.error('Erro de conexão ao salvar preço:', err);
     alert('Ocorreu um erro de conexão ao tentar salvar.');
   }
 }
 
-// 5. CARDS DE INDICADORES NO TOPO (FATURAMENTO, CORTES, LIVRES, BLOQUEADOS)
+// 5. CARDS DE INDICADORES NO TOPO
+
 async function atualizarIndicadoresTopo() {
-  const dataHoje = document.getElementById('adminDataFiltro')?.value || new Date().toISOString().split('T')[0];
+  const dataHoje =
+    document.getElementById('adminDataFiltro')?.value ||
+    (() => {
+      const agora = new Date();
+      return `${agora.getFullYear()}-${String(agora.getMonth() + 1).padStart(2, '0')}-${String(agora.getDate()).padStart(2, '0')}`;
+    })();
 
   try {
     const { data: agendamentos, error: errAgend } = await supabaseClient
@@ -432,11 +639,20 @@ async function atualizarIndicadoresTopo() {
     const listaAgendamentos = agendamentos || [];
     const listaBloqueios = bloqueios || [];
 
-    const cortesAtivos = listaAgendamentos.filter(a => a.status !== 'cancelado');
-    const cortesConcluidos = listaAgendamentos.filter(a => a.status === 'concluido' || a.status === 'confirmado');
+    const cortesAtivos = listaAgendamentos.filter(
+      a => a.status !== 'cancelado'
+    );
+
+    const cortesConcluidos = listaAgendamentos.filter(
+      a => a.status === 'concluido' || a.status === 'confirmado'
+    );
 
     const faturamentoTotal = cortesConcluidos.reduce((acc, curr) => {
-      const precoLimpo = String(curr.valor || curr.preco || 0).replace('R$', '').replace(',', '.').trim();
+      const precoLimpo = String(curr.valor || curr.preco || 0)
+        .replace('R$', '')
+        .replace(',', '.')
+        .trim();
+
       return acc + (parseFloat(precoLimpo) || 0);
     }, 0);
 
@@ -446,42 +662,83 @@ async function atualizarIndicadoresTopo() {
     const elBloq = document.getElementById('horariosBloqueados');
 
     if (elQtd) elQtd.innerText = cortesAtivos.length;
+
     if (elFat) {
       elFat.innerText = faturamentoTotal.toLocaleString('pt-BR', {
         style: 'currency',
         currency: 'BRL'
       });
     }
-    if (elBloq) elBloq.innerText = listaBloqueios.length;
-    if (elLivres) {
-      const totalHorariosPadrao = HORARIOS_PADRAO.length;
-      const ocupadosOuBloqueados = cortesAtivos.length + listaBloqueios.length;
-      elLivres.innerText = Math.max(0, totalHorariosPadrao - ocupadosOuBloqueados);
-    }
 
+    if (elBloq) elBloq.innerText = listaBloqueios.length;
+
+    if (elLivres) {
+      // Conta os horários de início disponíveis, levando em consideração
+      // os agendamentos e bloqueios que ocupam intervalos de 40 minutos.
+      const horariosLivres = HORARIOS_PADRAO.filter(horario => {
+        const temAgendamento = cortesAtivos.some(a =>
+          a.horario &&
+          horariosSeSobrepoem(
+            horario,
+            DURACAO_AGENDAMENTO_MINUTOS,
+            a.horario,
+            DURACAO_AGENDAMENTO_MINUTOS
+          )
+        );
+
+        const temBloqueio = listaBloqueios.some(b =>
+          b.horario &&
+          horariosSeSobrepoem(
+            horario,
+            DURACAO_AGENDAMENTO_MINUTOS,
+            b.horario,
+            DURACAO_AGENDAMENTO_MINUTOS
+          )
+        );
+
+        return !temAgendamento && !temBloqueio;
+      });
+
+      elLivres.innerText = horariosLivres.length;
+    }
   } catch (err) {
     console.error('Erro ao atualizar indicadores do topo:', err);
   }
 }
 
 // 6. UTILITÁRIOS, LOGOUT E WHATSAPP
+
 function fazerLogoutAdmin() {
   localStorage.removeItem(DB_KEYS.USUARIO_LOGADO);
   window.location.href = 'login.html';
 }
 
 function abrirWhatsAppCliente(telefone, nomeCliente, data, hora, servico) {
-  let numeroAlvo = telefone ? telefone.replace(/\D/g, '') : NUMERO_BARBEARIA;
+  let numeroAlvo = telefone
+    ? telefone.replace(/\D/g, '')
+    : NUMERO_BARBEARIA;
 
   if (numeroAlvo.length <= 11 && !numeroAlvo.startsWith('55')) {
     numeroAlvo = '55' + numeroAlvo;
   }
 
   const partesData = data ? data.split('-') : [];
-  const dataFormatada = partesData.length === 3 ? `${partesData[2]}/${partesData[1]}/${partesData[0]}` : data;
 
-  const mensagem = `Olá, ${nomeCliente}! 👋\n\nConfirmamos o seu agendamento na *Odivelas Barbearia*:\n\n✂️ *Serviço:* ${servico}\n📅 *Data:* ${dataFormatada}\n⏰ *Horário:* ${hora}\n\nTe esperamos! Se precisar alterar algo, me avise por aqui.`;
+  const dataFormatada =
+    partesData.length === 3
+      ? `${partesData[2]}/${partesData[1]}/${partesData[0]}`
+      : data;
 
-  const urlWhatsApp = `https://wa.me/${numeroAlvo}?text=${encodeURIComponent(mensagem)}`;
+  const mensagem =
+    `Olá, ${nomeCliente}! 👋\n\n` +
+    `Confirmamos o seu agendamento na *Odivelas Barbearia*:\n\n` +
+    `✂️ *Serviço:* ${servico}\n` +
+    `📅 *Data:* ${dataFormatada}\n` +
+    `⏰ *Horário:* ${hora}\n\n` +
+    `Te esperamos! Se precisar alterar algo, me avise por aqui.`;
+
+  const urlWhatsApp =
+    `https://wa.me/${numeroAlvo}?text=${encodeURIComponent(mensagem)}`;
+
   window.open(urlWhatsApp, '_blank');
 }
