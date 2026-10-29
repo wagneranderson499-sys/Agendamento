@@ -48,11 +48,10 @@
     }
 
     .info-card:hover {
-      transform: translateY(-4px);
+      transform: translateY(-3px);
       border-color: rgba(234, 179, 8, .45);
     }
 
-    /* Botão discreto para acesso administrativo */
     .admin-discreto {
       color: #52525b;
       background: transparent;
@@ -65,9 +64,58 @@
       border-color: #27272a;
     }
 
-    /* Garante que os modais iniciem fechados */
     .modal-fechado {
       display: none !important;
+    }
+
+    /* Ajustes para telas pequenas */
+    @media (max-width: 639px) {
+      .diferencial-card {
+        padding: 12px !important;
+        min-width: 0;
+      }
+
+      .diferencial-card h3 {
+        font-size: 11px;
+        line-height: 1.4;
+        overflow-wrap: anywhere;
+      }
+
+      .diferencial-card p {
+        font-size: 10px;
+        line-height: 1.5;
+      }
+
+      .contato-card {
+        padding: 12px !important;
+        gap: 8px !important;
+        align-items: flex-start;
+      }
+
+      .contato-card .contato-icone {
+        width: 34px;
+        height: 34px;
+        flex-shrink: 0;
+        font-size: 15px;
+        border-radius: 10px;
+      }
+
+      .contato-card h3 {
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .contato-card p {
+        font-size: 11px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
+
+      .contato-card .contato-link {
+        font-size: 10px;
+        line-height: 1.5;
+        overflow-wrap: anywhere;
+      }
     }
   </style>
 </head>
@@ -92,10 +140,7 @@
         </div>
       </a>
 
-      <!-- BOTÕES DO CABEÇALHO -->
       <nav class="flex items-center gap-2" aria-label="Navegação do cliente">
-
-        <!-- Acesso administrativo discreto -->
         <a href="cadastroLogin.html"
           aria-label="Acesso administrativo"
           title="Acesso administrativo"
@@ -103,22 +148,20 @@
           <i class="fa-solid fa-user-shield"></i>
         </a>
 
-        <!-- Meus agendamentos: botão menor -->
         <a href="meus-agendamentos.html"
           class="inline-flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 hover:border-zinc-600 text-zinc-300 hover:text-white text-[10px] sm:text-xs font-semibold px-2 py-1.5 rounded-lg transition">
           <i class="fa-regular fa-calendar-check text-red-500"></i>
           <span>Meus horários</span>
         </a>
-
       </nav>
     </div>
   </header>
 
-  <main class="flex-1 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black px-4 md:px-8 py-10 md:py-14">
+  <main class="flex-1 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-zinc-900 via-zinc-950 to-black px-4 md:px-8 py-8 md:py-14">
 
     <div class="max-w-5xl mx-auto">
 
-      <!-- APRESENTAÇÃO DA BARBEARIA -->
+      <!-- APRESENTAÇÃO -->
       <section class="mb-12">
 
         <div class="text-center mb-8">
@@ -144,41 +187,45 @@
           </a>
         </div>
 
-        <!-- PROFISSIONAL -->
-        <div class="bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden mb-6">
-          <div class="grid md:grid-cols-5">
+        <!-- CARD DO PROFISSIONAL -->
+        <div class="max-w-4xl mx-auto bg-zinc-900/80 border border-zinc-800 rounded-2xl overflow-hidden mb-8">
+          <div class="grid grid-cols-1 sm:grid-cols-5 items-stretch">
 
-            <div class="md:col-span-2 min-h-[240px] md:min-h-[320px] bg-black">
+            <!-- Foto menor no celular, sem cortar a imagem -->
+            <div class="sm:col-span-2 h-44 sm:h-auto sm:min-h-[260px] bg-black overflow-hidden">
               <img src="hs.jpeg" alt="HS Barbeiro"
-                class="w-full h-full object-cover object-center max-h-[380px]">
+                class="w-full h-full object-cover object-center">
             </div>
 
-            <div class="md:col-span-3 p-6 md:p-9 flex flex-col justify-center">
-              <span class="text-yellow-500 text-xs font-bold uppercase tracking-[3px] mb-3">
+            <!-- Informações do profissional -->
+            <div class="sm:col-span-3 p-4 sm:p-6 md:p-8 flex flex-col justify-center">
+              <span class="text-yellow-500 text-[10px] sm:text-xs font-bold uppercase tracking-[3px] mb-2">
                 <i class="fa-solid fa-award mr-1"></i>
                 Nosso profissional
               </span>
 
-              <h2 class="font-title text-2xl md:text-3xl font-black text-white mb-4">
+              <h2 class="font-title text-xl sm:text-2xl md:text-3xl font-black text-white mb-3">
                 HS Barbeiro
               </h2>
 
-              <p class="text-zinc-400 text-sm md:text-base leading-relaxed mb-4">
+              <p class="text-zinc-400 text-xs sm:text-sm md:text-base leading-relaxed mb-4">
                 Especialista em degradês, barbas alinhadas e cortes masculinos em
                 São Caetano de Odivelas. Atendimento dedicado, pontualidade e atenção
                 aos detalhes para valorizar seu estilo.
               </p>
 
               <div class="flex flex-wrap gap-2">
-                <span class="text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-3 py-2">
+                <span class="text-[10px] sm:text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-2.5 py-1.5">
                   <i class="fa-solid fa-scissors text-red-500 mr-1"></i>
                   Cortes masculinos
                 </span>
-                <span class="text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-3 py-2">
+
+                <span class="text-[10px] sm:text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-2.5 py-1.5">
                   <i class="fa-solid fa-check text-yellow-500 mr-1"></i>
                   Acabamento preciso
                 </span>
-                <span class="text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-3 py-2">
+
+                <span class="text-[10px] sm:text-xs text-zinc-300 bg-zinc-950 border border-zinc-800 rounded-full px-2.5 py-1.5">
                   <i class="fa-regular fa-clock text-red-500 mr-1"></i>
                   Atendimento pontual
                 </span>
@@ -189,21 +236,22 @@
         </div>
 
         <!-- DIFERENCIAIS -->
-        <div class="mb-10">
-          <div class="text-center mb-6">
+        <div class="mb-8">
+          <div class="text-center mb-5">
             <span class="text-yellow-500 text-xs uppercase tracking-[3px] font-bold">
               <i class="fa-solid fa-star mr-1"></i>
               Nossos diferenciais
             </span>
-            <h2 class="font-title text-xl md:text-2xl font-black uppercase mt-2">
+            <h2 class="font-title text-lg sm:text-xl md:text-2xl font-black uppercase mt-2">
               Uma experiência completa
             </h2>
           </div>
 
-          <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <!-- Três cartões lado a lado também no celular -->
+          <div class="grid grid-cols-3 gap-2 sm:gap-4">
 
-            <article class="info-card bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xl mb-4">
+            <article class="info-card diferencial-card min-w-0 bg-zinc-900/70 border border-zinc-800 rounded-xl sm:rounded-2xl p-3 sm:p-5">
+              <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-base sm:text-xl mb-3">
                 <i class="fa-solid fa-beer-mug-empty"></i>
               </div>
               <h3 class="font-bold text-white mb-2">Bebidas &amp; Chopp Gelado</h3>
@@ -212,8 +260,8 @@
               </p>
             </article>
 
-            <article class="info-card bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-500 text-xl mb-4">
+            <article class="info-card diferencial-card min-w-0 bg-zinc-900/70 border border-zinc-800 rounded-xl sm:rounded-2xl p-3 sm:p-5">
+              <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center bg-red-500/10 border border-red-500/20 text-red-500 text-base sm:text-xl mb-3">
                 <i class="fa-solid fa-music"></i>
               </div>
               <h3 class="font-bold text-white mb-2">Boa Música &amp; Ar-condicionado</h3>
@@ -222,8 +270,8 @@
               </p>
             </article>
 
-            <article class="info-card bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5">
-              <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xl mb-4">
+            <article class="info-card diferencial-card min-w-0 bg-zinc-900/70 border border-zinc-800 rounded-xl sm:rounded-2xl p-3 sm:p-5">
+              <div class="w-9 h-9 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-base sm:text-xl mb-3">
                 <i class="fa-solid fa-calendar-check"></i>
               </div>
               <h3 class="font-bold text-white mb-2">Atendimento Pontual</h3>
@@ -236,20 +284,23 @@
         </div>
 
         <!-- LOCALIZAÇÃO E CONTATO -->
-        <div class="grid md:grid-cols-2 gap-4">
+        <!-- Dois cartões lado a lado no celular -->
+        <div class="grid grid-cols-2 gap-2 sm:gap-4">
 
           <a href="https://maps.app.goo.gl/bqbvQHCXooT9B3aE9?g_st=iw"
             target="_blank" rel="noopener noreferrer"
-            class="info-card flex items-center gap-4 bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5 group">
-            <div class="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center bg-red-500/10 text-red-500 text-xl">
+            class="info-card contato-card min-w-0 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-zinc-900/70 border border-zinc-800 rounded-xl sm:rounded-2xl p-3 sm:p-5 group">
+
+            <div class="contato-icone w-12 h-12 shrink-0 rounded-xl flex items-center justify-center bg-red-500/10 text-red-500 text-xl">
               <i class="fa-solid fa-location-dot"></i>
             </div>
-            <div class="flex-1">
+
+            <div class="flex-1 min-w-0">
               <h3 class="font-bold text-white mb-1">Venha nos visitar</h3>
               <p class="text-sm text-zinc-400 leading-relaxed">
                 Av. Presidente Vargas, Bairro Centro, São Caetano de Odivelas - PA.
               </p>
-              <span class="inline-block text-xs text-yellow-500 font-bold mt-2 group-hover:text-yellow-400">
+              <span class="contato-link inline-block text-xs text-yellow-500 font-bold mt-2 group-hover:text-yellow-400">
                 Ver localização <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
               </span>
             </div>
@@ -257,16 +308,18 @@
 
           <a href="https://instagram.com/odivelas_barbearia"
             target="_blank" rel="noopener noreferrer"
-            class="info-card flex items-center gap-4 bg-zinc-900/70 border border-zinc-800 rounded-2xl p-5 group">
-            <div class="w-12 h-12 shrink-0 rounded-xl flex items-center justify-center bg-yellow-500/10 text-yellow-500 text-xl">
+            class="info-card contato-card min-w-0 flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 bg-zinc-900/70 border border-zinc-800 rounded-xl sm:rounded-2xl p-3 sm:p-5 group">
+
+            <div class="contato-icone w-12 h-12 shrink-0 rounded-xl flex items-center justify-center bg-yellow-500/10 text-yellow-500 text-xl">
               <i class="fa-brands fa-instagram"></i>
             </div>
-            <div class="flex-1">
+
+            <div class="flex-1 min-w-0">
               <h3 class="font-bold text-white mb-1">Siga a barbearia</h3>
               <p class="text-sm text-zinc-400 leading-relaxed">
                 Acompanhe nosso trabalho, cortes e novidades no Instagram.
               </p>
-              <span class="inline-block text-xs text-yellow-500 font-bold mt-2 group-hover:text-yellow-400">
+              <span class="contato-link inline-block text-xs text-yellow-500 font-bold mt-2 group-hover:text-yellow-400">
                 @odivelas_barbearia <i class="fa-solid fa-arrow-up-right-from-square ml-1"></i>
               </span>
             </div>
@@ -292,9 +345,9 @@
           </p>
         </div>
 
-        <!-- FORMULÁRIO -->
+        <!-- FORMULÁRIO ORIGINAL PRESERVADO -->
         <div class="bg-zinc-900/90 border border-zinc-800/90 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black overflow-hidden relative">
-          <div class="border-l-4 border-red-600 p-6 md:p-8">
+          <div class="border-l-4 border-red-600 p-4 sm:p-6 md:p-8">
 
             <form id="formAgendamento" class="space-y-8">
 
@@ -325,66 +378,66 @@
                   2. Selecione o Corte / Serviço
                 </label>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-4" id="listaServicos">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4" id="listaServicos">
 
                   <button type="button" data-nome="Degradê" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="degrade.jpg" alt="Degradê" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Degradê</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Degradê</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte moderno com acabamento preciso.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
                   </button>
 
                   <button type="button" data-nome="Navalhado" data-preco="25" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="coetenavalhado.jpg" alt="Navalhado" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Navalhado</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Navalhado</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento refinado na navalha.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 25,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
                   </button>
 
                   <button type="button" data-nome="Barba" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="barba1.jpg" alt="Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Barba</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Barba</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Modelagem profissional e alinhada.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
                   </button>
 
                   <button type="button" data-nome="Sobrancelha" data-preco="5" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="sobrancelha.jpg" alt="Sobrancelha" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Sobrancelha</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Sobrancelha</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento discreto e moderno.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 5,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 5,00</span>
                   </button>
 
                   <button type="button" data-nome="Social" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="social.jpg" alt="Social" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Social</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Social</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte elegante para qualquer ocasião.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 20,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
                   </button>
 
                   <button type="button" data-nome="Corte + Barba" data-preco="35" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-3">
-                    <div class="w-full h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
                       <img src="barba.jpg" alt="Corte + Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
                     </div>
-                    <span class="block font-bold uppercase text-sm text-white">Corte + Barba</span>
+                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Corte + Barba</span>
                     <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Pacote completo premium.</span>
-                    <span class="text-yellow-500 font-bold text-base">R$ 35,00</span>
+                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 35,00</span>
                   </button>
 
                 </div>
@@ -466,7 +519,7 @@
     </div>
   </main>
 
-  <!-- MODAL DE REVISÃO: começa fechado -->
+  <!-- MODAL DE REVISÃO -->
   <div id="modalRevisao"
     class="modal-fechado fixed inset-0 bg-black/85 backdrop-blur-md items-center justify-center z-50 px-4 py-6"
     role="dialog" aria-modal="true" aria-labelledby="tituloRevisao">
@@ -490,32 +543,26 @@
           <span class="text-zinc-500">Barbeiro</span>
           <strong id="revisaoBarbeiro" class="text-white text-right">—</strong>
         </div>
-
         <div class="flex justify-between gap-4">
           <span class="text-zinc-500">Serviço</span>
           <strong id="revisaoServico" class="text-white text-right">—</strong>
         </div>
-
         <div class="flex justify-between gap-4">
           <span class="text-zinc-500">Data</span>
           <strong id="revisaoData" class="text-white text-right">—</strong>
         </div>
-
         <div class="flex justify-between gap-4">
           <span class="text-zinc-500">Horário</span>
           <strong id="revisaoHorario" class="text-white text-right">—</strong>
         </div>
-
         <div class="flex justify-between gap-4">
           <span class="text-zinc-500">Nome</span>
           <strong id="revisaoNome" class="text-white text-right break-words">—</strong>
         </div>
-
         <div class="flex justify-between gap-4">
           <span class="text-zinc-500">WhatsApp</span>
           <strong id="revisaoTelefone" class="text-white text-right break-words">—</strong>
         </div>
-
         <div class="border-t border-zinc-700 pt-3 mt-3 flex justify-between gap-4">
           <span class="text-zinc-300 font-bold">Valor total</span>
           <strong id="revisaoPreco" class="text-yellow-500 text-lg">—</strong>
@@ -540,7 +587,7 @@
     </div>
   </div>
 
-  <!-- MODAL DE SUCESSO: começa fechado -->
+  <!-- MODAL DE SUCESSO -->
   <div id="modalSucesso"
     class="modal-fechado fixed inset-0 bg-black/85 backdrop-blur-md items-center justify-center z-[60] px-4 py-6"
     role="dialog" aria-modal="true" aria-labelledby="tituloSucesso">
@@ -602,7 +649,6 @@
       </div>
 
       <div class="flex flex-col sm:flex-row items-center gap-5 text-center md:text-right text-xs">
-
         <a href="https://maps.app.goo.gl/bqbvQHCXooT9B3aE9?g_st=iw"
           target="_blank" rel="noopener noreferrer"
           class="flex items-center justify-center md:justify-end gap-2 text-zinc-400 hover:text-red-500 transition">
@@ -617,14 +663,12 @@
           <span>@odivelas_barbearia</span>
         </a>
 
-        <!-- Acesso administrativo discreto também no rodapé -->
         <a href="cadastroLogin.html"
           aria-label="Acesso administrativo"
           title="Acesso administrativo"
           class="admin-discreto w-7 h-7 flex items-center justify-center rounded-lg text-[11px]">
           <i class="fa-solid fa-user-shield"></i>
         </a>
-
       </div>
     </div>
 
@@ -667,10 +711,8 @@
       fecharModal('modalSucesso');
     }
 
-    // Fecha os modais ao clicar no fundo.
     ['modalRevisao', 'modalSucesso'].forEach(function (idModal) {
       const modal = document.getElementById(idModal);
-
       if (!modal) return;
 
       modal.addEventListener('click', function (evento) {
@@ -680,19 +722,16 @@
       });
     });
 
-    // Fecha os modais ao pressionar Escape.
     document.addEventListener('keydown', function (evento) {
       if (evento.key === 'Escape') {
         fecharTodosOsModais();
       }
     });
 
-    // Evita que o navegador restaure um modal aberto ao voltar à página.
     window.addEventListener('pageshow', function () {
       fecharTodosOsModais();
     });
 
-    // Garante que ambos estejam fechados ao carregar a página.
     document.addEventListener('DOMContentLoaded', function () {
       fecharTodosOsModais();
     });
