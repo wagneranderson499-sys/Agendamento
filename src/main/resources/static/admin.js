@@ -72,7 +72,7 @@ const SERVICOS_PADRAO = [
   { nome: 'Degradê', preco: 20 },
   { nome: 'Navalhado', preco: 25 },
   { nome: 'Barba', preco: 20 },
-  { nome: 'Sobrancelha', preco: 5 },
+  { nome: 'Americano', preco: 5 },
   { nome: 'Social', preco: 20 },
   { nome: 'Corte + Barba', preco: 35 }
 ];

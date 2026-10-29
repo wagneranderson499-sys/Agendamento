@@ -646,17 +646,25 @@ if (erroSupa) throw erroSupa;
     fecharModalRevisao();
 
     const mensagem =
-      `Olá! Meu agendamento já foi registrado na Odivelas Barbearia.\n\n` +
-      `👤 Cliente: ${dados.nome}\n` +
-      `📱 Contato: ${dados.telefone}\n` +
-      `✂️ Serviço: ${dados.servico}\n` +
-      `💰 Preço: ${Number(dados.preco).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      })}\n` +
-      `📅 Data: ${dados.dataFormatada}\n` +
-      `⏰ Horário: ${dados.horario}\n` +
-      `💈 Barbeiro: ${dados.barbeiro}`;
+  `Olá, ${dados.nome}! 👋\n\n` +
+  `Seu agendamento na *Odivelas Barbearia* foi registrado com sucesso! ✅💈\n\n` +
+  `📋 *RESUMO DO AGENDAMENTO*\n\n` +
+  `👤 *Cliente:* ${dados.nome}\n` +
+  `📱 *Contato:* ${dados.telefone}\n` +
+  `✂️ *Serviço:* ${dados.servico}\n` +
+  `💰 *Valor:* ${Number(dados.preco).toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  })}\n` +
+  `📅 *Data:* ${dados.dataFormatada}\n` +
+  `⏰ *Horário:* ${dados.horario}\n` +
+  `💈 *Barbeiro:* ${dados.barbeiro}\n\n` +
+  `⚠️ *AVISOS IMPORTANTES*\n\n` +
+  `• Acesse novamente o sistema da Odivelas Barbearia para consultar os detalhes e acompanhar as informações do seu agendamento.\n` +
+  `• Confira atentamente a data, o horário e o serviço escolhido.\n` +
+  `• Em caso de dúvidas ou necessidade de alteração, entre em contato com a barbearia.\n\n` +
+  `Obrigado por escolher a *Odivelas Barbearia*! ✂️\n` +
+  `Esperamos por você! 🤝`;
 
     const linkZap =
       `https://wa.me/${SEU_WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
