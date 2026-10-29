@@ -1,19 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="pt-br" class="scroll-smooth">
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="icon" type="image/png" href="barbearia (1).png">
-  <title>Minha Conta & Agendamentos - Odivelas Barbearia</title>
+  <title>Meus Agendamentos - Odivelas Barbearia</title>
 
-  <!-- Google Fonts & Font Awesome -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -29,15 +28,18 @@
   </script>
 
   <style>
-    /* Otimizações de scroll e toque mobile */
     body {
       -webkit-tap-highlight-color: transparent;
       padding-top: env(safe-area-inset-top);
       padding-bottom: env(safe-area-inset-bottom);
     }
+
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: #0a0a0c; }
-    ::-webkit-scrollbar-thumb { background: #27272a; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb {
+      background: #27272a;
+      border-radius: 4px;
+    }
 
     .text-gradient-red {
       background: linear-gradient(135deg, #ef4444 0%, #dc2626 50%, #991b1b 100%);
@@ -48,265 +50,126 @@
   </style>
 </head>
 
-<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col justify-between selection:bg-red-600 selection:text-white pb-20 md:pb-0">
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen flex flex-col">
 
-    <div class="bg-amber-500/10 border border-amber-500/30 text-amber-300 p-3 rounded-xl text-xs flex items-center gap-2.5 mb-4">
-  <span class="text-base">⚠️</span>
-  <p><strong>Aviso importante:</strong> Caso não possa comparecer, por favor <strong>cancele com antecedência</strong> para disponibilizar o horário para outro cliente e não prejudicar a agenda da barbearia.</p>
-</div>
-  <!-- Header: Meus Agendamentos -->
+  <!-- Cabeçalho -->
   <header class="sticky top-0 z-50 bg-black/90 backdrop-blur-md border-b border-zinc-800/80 px-4 md:px-8 py-3.5">
-    <div class="max-w-7xl mx-auto flex items-center justify-between">
-      
-      <!-- Logo Oficial -->
+    <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+
       <a href="agendamento.html" class="flex items-center gap-3 group">
-        <img src="barbearia (1).png" alt="Odivelas Barbearia" class="w-10 h-10 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50 group-hover:scale-105 transition duration-300">
+        <img
+          src="barbearia (1).png"
+          alt="Odivelas Barbearia"
+          class="w-10 h-10 rounded-full object-cover border-2 border-yellow-500 shadow-lg shadow-red-950/50 group-hover:scale-105 transition"
+        >
+
         <div class="flex flex-col">
           <span class="font-title font-black text-lg md:text-xl tracking-wider text-white uppercase leading-none">
             ODIVELAS
           </span>
-          <span class="font-title text-[10px] md:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase leading-tight">
+          <span class="font-title text-[10px] md:text-xs tracking-[0.2em] text-yellow-500 font-bold uppercase">
             BARBEARIA
           </span>
         </div>
       </a>
 
-      <!-- Ações: Novo Agendamento + Sair -->
-      <div class="flex items-center gap-3">
-        <!-- Botão para fazer um novo agendamento -->
-        <a href="agendamento.html" class="hidden sm:flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-md">
-          <i class="fa-solid fa-plus text-xs"></i>
-          <span>Novo Agendamento</span>
-        </a>
-
-        <!-- Botão Voltar para Agendar -->
-        <a href="agendamento.html" class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 font-bold uppercase tracking-wider text-xs px-4 py-2 rounded-xl flex items-center gap-2 transition">
-          <i class="fa-solid fa-arrow-left text-xs text-yellow-500"></i>
-          <span>Voltar</span>
-        </a>
-
-        <!-- Botão Sair -->
-        <button onclick="fazerLogout()" title="Sair da Conta" class="bg-zinc-900 hover:bg-red-950/50 border border-zinc-800 hover:border-red-900/60 text-zinc-400 hover:text-red-400 p-2 rounded-xl transition">
-          <i class="fa-solid fa-right-from-bracket text-xs"></i>
-        </button>
-      </div>
+      <a
+        href="agendamento.html"
+        class="flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 text-white text-xs font-bold px-3.5 py-3 rounded-xl transition shadow-md"
+      >
+        <i class="fa-solid fa-plus"></i>
+        <span>Novo agendamento</span>
+      </a>
 
     </div>
   </header>
 
-  <!-- Conteúdo Principal -->
-  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-6 md:py-10">
+  <!-- Conteúdo principal -->
+  <main class="flex-1 max-w-4xl w-full mx-auto px-4 py-7 md:py-10">
 
-    <!-- Card de Perfil do Usuário com foto customizada -->
-    <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-5 md:p-6 mb-6 shadow-xl relative overflow-hidden">
-      <div class="flex flex-col sm:flex-row items-center gap-5">
-        
-        <!-- Upload de Foto de Perfil -->
-        <div class="relative group">
-          <div class="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-2 border-yellow-500/80 bg-zinc-950 flex items-center justify-center shadow-lg">
-            <img id="avatarImg" src="" alt="Foto de Perfil" class="w-full h-full object-cover hidden">
-            <i id="avatarFallback" class="fa-solid fa-user text-3xl text-zinc-600"></i>
-          </div>
+    <!-- Título -->
+    <section class="mb-7">
+      <p class="text-yellow-500 text-xs font-bold uppercase tracking-[0.25em] mb-2">
+        Odivelas Barbearia
+      </p>
 
-          <label for="inputFotoPerfil" class="absolute bottom-0 right-0 bg-yellow-500 hover:bg-yellow-400 text-black p-2 rounded-full cursor-pointer shadow-md transition active:scale-90" title="Alterar Foto">
-            <i class="fa-solid fa-camera text-xs"></i>
-          </label>
-          <input type="file" id="inputFotoPerfil" accept="image/*" class="hidden" onchange="atualizarFotoPerfil(event)">
-        </div>
+      <h1 class="font-title text-2xl md:text-3xl font-black uppercase tracking-wide">
+        Meus <span class="text-gradient-red">agendamentos</span>
+      </h1>
 
-        <!-- Info do Usuário -->
-        <div class="text-center sm:text-left flex-1">
-          <h2 id="exibicaoNome" class="font-title text-xl md:text-2xl font-black uppercase text-white tracking-wide">
-            Carregando...
-          </h2>
-          <div class="flex flex-wrap items-center justify-center sm:justify-start gap-3 mt-1.5 text-xs text-zinc-400">
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-phone text-yellow-500 text-[10px]"></i> <span id="exibicaoTelefone">--</span></span>
-            <span class="flex items-center gap-1.5"><i class="fa-solid fa-envelope text-yellow-500 text-[10px]"></i> <span id="exibicaoEmail">--</span></span>
-          </div>
-        </div>
+      <p class="text-zinc-400 text-sm mt-2">
+        Consulte os detalhes dos seus horários e serviços agendados.
+      </p>
+    </section>
 
+    <!-- Avisos -->
+    <section class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-4 md:p-5 mb-7">
+      <h2 class="text-amber-400 font-bold flex items-center gap-2 mb-3">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        Avisos importantes
+      </h2>
+
+      <div class="space-y-3 text-sm text-zinc-300">
+        <p class="flex items-start gap-2">
+          <i class="fa-solid fa-clock text-yellow-500 mt-1"></i>
+          <span>Chegue com 5 minutos de antecedência ao horário marcado.</span>
+        </p>
+
+        <p class="flex items-start gap-2">
+          <i class="fa-solid fa-calendar-xmark text-yellow-500 mt-1"></i>
+          <span>
+            Caso não possa comparecer, entre em contato com a barbearia
+            com antecedência para solicitar o cancelamento.
+          </span>
+        </p>
+
+        <p class="flex items-start gap-2">
+          <i class="fa-brands fa-whatsapp text-yellow-500 mt-1"></i>
+          <span>Em caso de dúvidas, fale com a barbearia pelo WhatsApp.</span>
+        </p>
       </div>
-    </div>
+    </section>
 
-    <!-- Navegação por Abas (Tabs) -->
-    <div class="flex border-b border-zinc-800 mb-6">
-      <button id="tabBtnAgendamentos" onclick="alternarAba('agendamentos')" 
-        class="flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-red-600 text-white flex items-center justify-center gap-2 transition">
-        <i class="fa-solid fa-calendar-check text-red-500"></i>
-        <span>Agendamentos</span>
-      </button>
+    <!-- Lista de agendamentos -->
+    <section>
+      <div class="flex items-center justify-between gap-3 mb-4">
+        <h2 class="font-title text-base md:text-lg font-bold uppercase tracking-wide">
+          <i class="fa-solid fa-calendar-check text-red-500 mr-2"></i>
+          Seus horários
+        </h2>
+      </div>
 
-      <button id="tabBtnPerfil" onclick="alternarAba('perfil')" 
-        class="flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition">
-        <i class="fa-solid fa-gear text-zinc-500"></i>
-        <span>Meus Dados</span>
-      </button>
-    </div>
-
-    <!-- Conteúdo da Aba 1: Lista de Agendamentos -->
-    <div id="abaAgendamentos" class="space-y-4">
+      <!-- O JavaScript preencherá esta área -->
       <div id="listaAgendamentos" class="space-y-4">
-        <!-- Renderizado dinamicamente via JS -->
+        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
+          <i class="fa-solid fa-spinner fa-spin text-2xl text-yellow-500 mb-3"></i>
+          <p class="text-zinc-400 text-sm">Carregando seus agendamentos...</p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Conteúdo da Aba 2: Edição dos Dados Pessoais -->
-    <div id="abaPerfil" class="hidden">
-      <div class="bg-zinc-900/90 border border-zinc-800/80 rounded-2xl p-5 md:p-6 shadow-xl">
-        <h3 class="font-title text-base font-bold uppercase tracking-wider text-white mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-user-gear text-yellow-500"></i> Atualizar Informações
-        </h3>
-
-        <form id="formPerfil" onsubmit="salvarPerfil(event)" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">Nome Completo</label>
-            <input type="text" id="campoNome" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition">
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">WhatsApp / Telefone</label>
-              <input type="tel" id="campoTelefone" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition" placeholder="(91) 98579-3959">
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-1">E-mail</label>
-              <input type="email" id="campoEmail" required class="w-full bg-zinc-950 border border-zinc-800 focus:border-red-600 rounded-xl px-4 py-3 text-sm text-white outline-none transition">
-            </div>
-          </div>
-
-          <button type="submit" class="w-full bg-yellow-500 hover:bg-yellow-400 text-black font-bold uppercase tracking-wider py-3.5 rounded-xl transition text-xs flex items-center justify-center gap-2 active:scale-98 shadow-lg shadow-yellow-500/10">
-            <i class="fa-solid fa-floppy-disk"></i>
-            <span>Salvar Alterações</span>
-          </button>
-        </form>
-      </div>
-    </div>
+    <!-- Botão para novo agendamento -->
+    <section class="mt-8">
+      <a
+        href="agendamento.html"
+        class="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm py-4 px-5 rounded-xl transition shadow-lg shadow-red-950/30"
+      >
+        <i class="fa-solid fa-plus"></i>
+        Fazer novo agendamento
+      </a>
+    </section>
 
   </main>
 
-  <!-- Rodapé Otimizado -->
-  <footer class="bg-black border-t border-zinc-800/80 py-6 text-center text-zinc-500 text-xs">
+  <!-- Rodapé -->
+  <footer class="bg-black border-t border-zinc-800/80 py-6 px-4 text-center text-zinc-500 text-xs mt-8">
     <p>© 2026 Odivelas Barbearia — Todos os direitos reservados.</p>
   </footer>
 
-  <!-- Script Embutido Unificado -->
-  <script>
-    const DB_KEY_SESSAO = 'odivelas_usuario_logado';
-    const DB_KEY_AGENDAMENTOS = 'odivelas_agendamentos';
-    const DB_KEY_HISTORICO = 'odivelas_historico';
+  <!-- Integração com o Supabase e carregamento dos agendamentos -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-client.js"></script>
+  <script src="meus-agendamento.js"></script>
 
-   document.addEventListener('DOMContentLoaded', () => {
-  carregarDadosUsuario();
-});
-
-    // 1. Alternar entre Abas
-    function alternarAba(aba) {
-      const btnAgendamentos = document.getElementById('tabBtnAgendamentos');
-      const btnPerfil = document.getElementById('tabBtnPerfil');
-      const abaAgendamentos = document.getElementById('abaAgendamentos');
-      const abaPerfil = document.getElementById('abaPerfil');
-
-      if (aba === 'agendamentos') {
-        abaAgendamentos.classList.remove('hidden');
-        abaPerfil.classList.add('hidden');
-
-        btnAgendamentos.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-red-600 text-white flex items-center justify-center gap-2 transition';
-        btnPerfil.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition';
-      } else {
-        abaAgendamentos.classList.add('hidden');
-        abaPerfil.classList.remove('hidden');
-
-        btnPerfil.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-yellow-500 text-white flex items-center justify-center gap-2 transition';
-        btnAgendamentos.className = 'flex-1 py-3 text-xs md:text-sm font-bold uppercase tracking-wider text-center border-b-2 border-transparent text-zinc-500 hover:text-zinc-300 flex items-center justify-center gap-2 transition';
-      }
-    }
-
-    // 2. Carregar e Atualizar Perfil
-    function carregarDadosUsuario() {
-      const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {
-        nome: 'Cliente',
-        nomeCompleto: 'Cliente',
-        telefone: '(91) 98579-3959',
-        email: 'cliente@odivelas.com',
-        foto: ''
-      };
-
-      const nomeFinal = usuario.nomeCompleto || usuario.nome || usuario.clienteNome || 'Cliente';
-      const telefoneFinal = usuario.telefone || usuario.whatsapp || '(91) 98579-3959';
-      const emailFinal = usuario.email || 'cliente@odivelas.com';
-
-      document.getElementById('exibicaoNome').innerText = nomeFinal;
-      document.getElementById('exibicaoTelefone').innerText = telefoneFinal;
-      document.getElementById('exibicaoEmail').innerText = emailFinal;
-
-      document.getElementById('campoNome').value = nomeFinal;
-      document.getElementById('campoTelefone').value = telefoneFinal;
-      document.getElementById('campoEmail').value = emailFinal;
-
-      // Foto Avatar
-      const avatarImg = document.getElementById('avatarImg');
-      const avatarFallback = document.getElementById('avatarFallback');
-
-      if (usuario.foto) {
-        avatarImg.src = usuario.foto;
-        avatarImg.classList.remove('hidden');
-        avatarFallback.classList.add('hidden');
-      } else {
-        avatarImg.classList.add('hidden');
-        avatarFallback.classList.remove('hidden');
-      }
-    }
-
-    function atualizarFotoPerfil(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        const fotoBase64 = e.target.result;
-        
-        const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {};
-        usuario.foto = fotoBase64;
-        localStorage.setItem(DB_KEY_SESSAO, JSON.stringify(usuario));
-
-        carregarDadosUsuario();
-      };
-      reader.readAsDataURL(file);
-    }
-
-    function salvarPerfil(event) {
-      event.preventDefault();
-      const usuario = JSON.parse(localStorage.getItem(DB_KEY_SESSAO)) || {};
-
-      const novoNome = document.getElementById('campoNome').value;
-      const novoTel = document.getElementById('campoTelefone').value;
-      const novoEmail = document.getElementById('campoEmail').value;
-
-      usuario.nome = novoNome;
-      usuario.nomeCompleto = novoNome;
-      usuario.telefone = novoTel;
-      usuario.whatsapp = novoTel;
-      usuario.email = novoEmail;
-
-      localStorage.setItem(DB_KEY_SESSAO, JSON.stringify(usuario));
-      carregarDadosUsuario();
-      alert('Seus dados foram atualizados com sucesso!');
-    }
-
-
-   
-
-    // 5. Logout
-    function fazerLogout() {
-      localStorage.removeItem(DB_KEY_SESSAO);
-      window.location.href = 'login.html';
-    }
-  </script>
-
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-client.js"></script>
-<script src="meus-agendamento.js"></script>
 </body>
 </html>

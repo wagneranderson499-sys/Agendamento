@@ -1,216 +1,328 @@
+
 /**
- * Arquivo: meus-agendamentos.js
- * Descrição: Exibição e cancelamento dos agendamentos do cliente logado.
+ * Arquivo: meus-agendamento.js
+ * Descrição: Exibição e cancelamento dos agendamentos do cliente.
  * Odivelas Barbearia
+ *
+ * Os agendamentos são exibidos a partir do localStorage.
+ * O Supabase continua sendo usado para atualizar cancelamentos.
  */
 
-let usuarioLogado = null;
+const DB_KEY_AGENDAMENTOS = 'odivelas_agendamentos';
 
 document.addEventListener('DOMContentLoaded', () => {
-  verificarSessao();
   carregarMeusAgendamentos();
 });
 
-/**
- * 1. Verifica se o cliente está logado
- */
-function verificarSessao() {
-  const sessao = localStorage.getItem('odivelas_usuario_logado');
-  
-  if (!sessao) {
-    // Se não houver sessão ativa, usa um perfil genérico em vez de travar
-    usuarioLogado = {
-      id: 'USR-GUEST',
-      nome: 'Cliente',
-      email: ''
-    };
-  } else {
-    try {
-      usuarioLogado = JSON.parse(sessao);
-    } catch (e) {
-      console.error('Erro ao ler usuario_logado:', e);
-      usuarioLogado = { id: 'USR-GUEST', nome: 'Cliente', email: '' };
-    }
+// Obtém os agendamentos salvos neste navegador.
+function obterAgendamentosLocais() {
+  try {
+    const dados = JSON.parse(
+      localStorage.getItem(DB_KEY_AGENDAMENTOS) || '[]'
+    );
+
+    return Array.isArray(dados) ? dados : [];
+  } catch (erro) {
+    console.error('Erro ao ler os agendamentos locais:', erro);
+    return [];
+  }
+}
+
+// Evita que dados inseridos pelo usuário sejam interpretados como HTML.
+function escaparHTML(valor) {
+  return String(valor ?? '').replace(/[&<>"']/g, caractere => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  })[caractere]);
+}
+
+// Formata a data sem depender do fuso horário do navegador.
+function formatarData(data) {
+  if (!data) return 'Data não informada';
+
+  const partes = String(data).split('-');
+
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
   }
 
-  // Atualiza o header com o nome do cliente
-  const elNome = document.getElementById('nomeClienteHeader');
-  if (elNome) {
-    elNome.textContent = usuarioLogado.nome || 'Cliente';
-  }
-}async function carregarMeusAgendamentos() {
+  return escaparHTML(data);
+}
 
+// Formata o preço em reais.
+function formatarPreco(preco) {
+  const valor = Number(preco);
+
+  if (!Number.isFinite(valor)) return 'A consultar';
+
+  return valor.toLocaleString('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  });
+}
+
+// Carrega todos os agendamentos deste navegador.
+function carregarMeusAgendamentos() {
   const container = document.getElementById('listaAgendamentos');
 
   if (!container) return;
-  try {
-    // 1. Busca todos os agendamentos no Supabase
-    const { data: agendamentosDb, error } = await supabaseClient
-      .from('agendamentos')
-      .select('*')
-      .order('data', { ascending: false })
-      .order('horario', { ascending: false });
 
-    if (error) {
-      console.error('Erro ao buscar agendamentos do Supabase:', error.message);
-      return;
-    }
+  const agendamentos = obterAgendamentosLocais();
 
-    let meusAgendamentos = agendamentosDb || [];
-    console.log('USUÁRIO LOGADO:', usuarioLogado);
-console.log('AGENDAMENTOS VINDOS DO SUPABASE:', agendamentosDb);
-
-    // 2. Se o usuário estiver logado, filtra pelo ID do usuário
-    if (typeof usuarioLogado !== 'undefined' && usuarioLogado && usuarioLogado.id) {
-      const userId = String(usuarioLogado.id);
-
-      const filtrados = meusAgendamentos.filter(a => {
-        // Mapeia possíveis nomes da coluna de ID na tabela agendamentos
-      const agendamentoUserId = String(
-  a.usuario_id ||
-  a.user_id ||
-  a.cliente_id ||
-  a.clienteId ||
-  a.id_usuario ||
-  ''
-);
-
-return agendamentoUserId === userId;
-      });
-
-      meusAgendamentos = filtrados;
-    }
-
-    const hoje = new Date().toISOString().split('T')[0];
-
-    // PRÓXIMOS: Apenas pendentes/confirmados com data de hoje ou futura
-    const proximos = meusAgendamentos.filter(
-      a => a.data >= hoje && a.status !== 'cancelado' && a.status !== 'concluido'
-    );
-
-    // HISTÓRICO: Cortes concluídos, cancelados OU datas passadas
-    const historico = meusAgendamentos.filter(
-      a => a.status === 'concluido' || a.status === 'cancelado' || a.data < hoje
-    );
-// 3. Junta próximos e histórico e renderiza na tela
-const todos = [...proximos, ...historico];
-
-renderizarLista(container, todos, true);
-  } catch (err) {
-    console.error('Erro ao carregar meus agendamentos:', err);
-  }
-}
-/**
- * 3. Renderiza os cards de agendamento no container correto
- */
-function renderizarLista(container, lista, eProximo) {
-  if (!lista || lista.length === 0) {
+  if (agendamentos.length === 0) {
     container.innerHTML = `
-      <div class="p-6 text-center text-zinc-500 border border-zinc-900 rounded-xl bg-zinc-950/40">
-        <i class="fa-regular fa-calendar-xmark text-2xl mb-2 opacity-50"></i>
-        <p class="text-sm">Nenhum agendamento encontrado.</p>
+      <div class="bg-zinc-900/70 border border-zinc-800 rounded-2xl p-8 text-center">
+        <i class="fa-regular fa-calendar-xmark text-3xl text-zinc-600 mb-4"></i>
+
+        <h3 class="text-white font-bold mb-2">
+          Nenhum agendamento encontrado
+        </h3>
+
+        <p class="text-zinc-400 text-sm mb-5">
+          Quando você fizer um agendamento, as informações aparecerão aqui.
+        </p>
+
+        <a
+          href="agendamento.html"
+          class="inline-flex items-center gap-2 bg-red-600 hover:bg-red-500 text-white font-bold text-sm px-5 py-3 rounded-xl transition"
+        >
+          <i class="fa-solid fa-plus"></i>
+          Fazer agendamento
+        </a>
       </div>
     `;
     return;
   }
 
-  container.innerHTML = lista
-    .map((a) => {
-      // Formatação da data (AAAA-MM-DD -> DD/MM/AAAA)
-      const partesData = a.data ? a.data.split('-') : [];
-      const dataFormatada = partesData.length === 3 ? `${partesData[2]}/${partesData[1]}/${partesData[0]}` : (a.data || 'Data N/A');
-      const precoFormatado = Number(a.preco || a.valor || 0).toFixed(2).replace('.', ',');
-      const horaExibicao = a.horario || a.hora || 'Horário N/A';
+  // Ordena do mais recente para o mais antigo.
+  agendamentos.sort((a, b) => {
+    const dataA = `${a.data || ''} ${a.horario || a.hora || ''}`;
+    const dataB = `${b.data || ''} ${b.horario || b.hora || ''}`;
 
-      const isCancelado = a.status === 'cancelado';
-      const isConcluido = a.status === 'concluido';
+    return dataB.localeCompare(dataA);
+  });
 
-      // Definição das cores e textos da tag de status
-      let badgeHtml = '';
-      if (isConcluido) {
-        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-emerald-950/80 text-emerald-400 border border-emerald-500/50 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-          <i class="fa-solid fa-check text-[10px]"></i> Corte Concluído
-        </span>`;
-      } else if (isCancelado) {
-        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-red-950/40 text-red-400 border border-red-900/50 px-2.5 py-0.5 rounded-full">
-          Cancelado
-        </span>`;
-      } else {
-        badgeHtml = `<span class="text-xs font-bold uppercase tracking-wider bg-blue-950/50 text-blue-400 border border-blue-900/50 px-2.5 py-0.5 rounded-full">
-          Confirmado
-        </span>`;
+  container.innerHTML = agendamentos
+    .map(renderizarAgendamento)
+    .join('');
+}
+
+// Monta cada cartão de agendamento.
+function renderizarAgendamento(a) {
+  const status = String(a.status || 'confirmado').toLowerCase();
+
+  const cancelado = status === 'cancelado';
+  const concluido = status === 'concluido' || status === 'concluído';
+
+  let textoStatus = 'Confirmado';
+  let classeStatus =
+    'bg-blue-950/50 text-blue-400 border-blue-900/50';
+
+  if (cancelado) {
+    textoStatus = 'Cancelado';
+    classeStatus = 'bg-red-950/40 text-red-400 border-red-900/50';
+  } else if (concluido) {
+    textoStatus = 'Concluído';
+    classeStatus =
+      'bg-emerald-950/80 text-emerald-400 border-emerald-500/50';
+  }
+
+  const nomeServico = escaparHTML(
+    a.servico || a.servico_nome || 'Serviço não informado'
+  );
+
+  const barbeiro = escaparHTML(
+    a.barbeiro || 'HS Barbeiro'
+  );
+
+  const nomeCliente = escaparHTML(
+    a.clienteNome || a.cliente_nome || a.nome || ''
+  );
+
+  const telefone = escaparHTML(
+    a.clienteTelefone || a.cliente_telefone || a.telefone || ''
+  );
+
+  const data = formatarData(a.data);
+  const horario = escaparHTML(
+    a.horario || a.hora || 'Não informado'
+  );
+
+  const preco = formatarPreco(a.preco ?? a.valor);
+
+  // O ID real do banco será necessário para cancelar no Supabase.
+  const idBanco = a.idSupabase ?? a.id_supabase ?? null;
+
+  const podeCancelar =
+    status === 'confirmado' &&
+    idBanco !== null &&
+    idBanco !== undefined &&
+    String(idBanco).trim() !== '';
+
+  return `
+    <article class="bg-zinc-900/80 border ${
+      cancelado
+        ? 'border-zinc-800 opacity-75'
+        : concluido
+          ? 'border-emerald-900/40'
+          : 'border-zinc-800'
+    } rounded-2xl p-5 md:p-6 transition">
+
+      <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-5">
+
+        <div>
+          <span class="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider border px-3 py-1 rounded-full ${classeStatus}">
+            <i class="fa-solid ${
+              cancelado
+                ? 'fa-xmark'
+                : concluido
+                  ? 'fa-check'
+                  : 'fa-calendar-check'
+            }"></i>
+            ${textoStatus}
+          </span>
+
+          <h3 class="text-lg font-bold text-white mt-3">
+            ${nomeServico}
+          </h3>
+
+          <p class="text-sm text-zinc-400 mt-1">
+            <i class="fa-solid fa-scissors text-red-500 mr-2"></i>
+            ${barbeiro}
+          </p>
+        </div>
+
+        <p class="text-amber-400 font-bold text-lg">
+          ${preco}
+        </p>
+
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+        <div class="bg-zinc-950/70 border border-zinc-800 rounded-xl p-3">
+          <p class="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+            Data
+          </p>
+          <p class="text-sm text-zinc-200">
+            <i class="fa-regular fa-calendar text-red-500 mr-2"></i>
+            ${data}
+          </p>
+        </div>
+
+        <div class="bg-zinc-950/70 border border-zinc-800 rounded-xl p-3">
+          <p class="text-zinc-500 text-xs uppercase tracking-wider mb-1">
+            Horário
+          </p>
+          <p class="text-sm text-zinc-200">
+            <i class="fa-regular fa-clock text-red-500 mr-2"></i>
+            ${horario}
+          </p>
+        </div>
+
+      </div>
+
+      ${
+        nomeCliente || telefone
+          ? `
+            <div class="mt-4 text-xs text-zinc-400 space-y-1">
+              ${
+                nomeCliente
+                  ? `<p><i class="fa-regular fa-user mr-2"></i>${nomeCliente}</p>`
+                  : ''
+              }
+              ${
+                telefone
+                  ? `<p><i class="fa-brands fa-whatsapp mr-2"></i>${telefone}</p>`
+                  : ''
+              }
+            </div>
+          `
+          : ''
       }
 
-      // Estilo da caixa principal
-      let cardEstilo = 'border-zinc-800 bg-zinc-950/80 text-white';
-      if (isCancelado) cardEstilo = 'border-zinc-900 bg-zinc-950/30 text-zinc-500';
-      if (isConcluido) cardEstilo = 'border-emerald-900/40 bg-zinc-950/90 text-white';
-
-      return `
-        <div class="border ${cardEstilo} rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 transition">
-          <div class="space-y-1">
-            <div class="flex items-center gap-2">
-              ${badgeHtml}
-              <span class="text-xs text-zinc-400"><i class="fa-solid fa-scissors text-red-500 mr-1"></i> ${a.barbeiro || 'HS Barbeiro'}</span>
+      ${
+        podeCancelar
+          ? `
+            <div class="mt-5 pt-4 border-t border-zinc-800 flex justify-end">
+              <button
+                type="button"
+                onclick="cancelarAgendamento('${escaparHTML(idBanco)}')"
+                class="px-4 py-2.5 text-xs font-bold text-red-400 hover:text-white border border-red-900/60 hover:bg-red-700 hover:border-red-600 rounded-xl transition"
+              >
+                <i class="fa-solid fa-xmark mr-1"></i>
+                Cancelar agendamento
+              </button>
             </div>
-            <h4 class="font-bold text-base text-zinc-100">${a.servico || a.servico_nome || 'Corte'}</h4>
-            <div class="flex items-center gap-4 text-xs text-zinc-400 pt-1">
-              <span><i class="fa-regular fa-calendar mr-1 text-red-500"></i> ${dataFormatada}</span>
-              <span><i class="fa-regular fa-clock mr-1 text-red-500"></i> ${horaExibicao}</span>
-              <span class="text-amber-500 font-bold">R$ ${precoFormatado}</span>
-            </div>
-          </div>
-
-          ${
-           a.status === 'confirmado'
-              ? `
-            <button 
-              type="button" 
-              onclick="cancelarAgendamento('${a.id}')" 
-              class="self-start md:self-center px-3 py-1.5 text-xs font-semibold text-red-400 hover:text-red-300 border border-red-900/60 hover:border-red-600 bg-red-950/20 rounded-lg transition duration-200">
-              <i class="fa-solid fa-xmark mr-1"></i> Cancelar
-            </button>
           `
-              : ''
-          }
-        </div>
-      `;
-    })
-    .join('');
-}async function cancelarAgendamento(idAgendamento) {
+          : ''
+      }
 
-  if (!confirm('Deseja realmente cancelar este agendamento?')) return;
+    </article>
+  `;
+}
+
+// Cancela o agendamento no Supabase e sincroniza a cópia local.
+async function cancelarAgendamento(idAgendamento) {
+  const confirmado = confirm(
+    'Deseja realmente cancelar este agendamento?'
+  );
+
+  if (!confirmado) return;
+
+  if (typeof supabaseClient === 'undefined' || !supabaseClient) {
+    alert('Não foi possível conectar ao sistema. Tente novamente.');
+    return;
+  }
 
   try {
-
-    // Atualiza o status diretamente no Supabase
-    const { error } = await supabaseClient
+    const { data, error } = await supabaseClient
       .from('agendamentos')
       .update({ status: 'cancelado' })
-      .eq('id', idAgendamento);
+      .eq('id', idAgendamento)
+      .eq('status', 'confirmado')
+      .select('id');
 
     if (error) {
-      console.error('Erro ao cancelar no Supabase:', error.message);
-      alert('Erro ao cancelar o agendamento.');
+      console.error('Erro ao cancelar no Supabase:', error);
+      alert(
+        'Não foi possível cancelar. Verifique as permissões do banco de dados e tente novamente.'
+      );
       return;
     }
 
-    alert('Agendamento cancelado com sucesso! O horário foi liberado.');
+    if (!data || data.length === 0) {
+      alert(
+        'O agendamento não foi atualizado. Ele pode já estar cancelado ou o banco não autorizou a operação.'
+      );
+      return;
+    }
 
-    // Atualiza a tela novamente buscando os dados do Supabase
-    await carregarMeusAgendamentos();
+    const agendamentos = obterAgendamentosLocais();
 
-  } catch (err) {
+    const atualizados = agendamentos.map(a => {
+      const idLocal = a.idSupabase ?? a.id_supabase;
 
-    console.error('Erro ao processar cancelamento:', err);
+      if (String(idLocal) === String(idAgendamento)) {
+        return { ...a, status: 'cancelado' };
+      }
+
+      return a;
+    });
+
+    localStorage.setItem(
+      DB_KEY_AGENDAMENTOS,
+      JSON.stringify(atualizados)
+    );
+
+    alert('Agendamento cancelado com sucesso!');
+    carregarMeusAgendamentos();
+
+  } catch (erro) {
+    console.error('Erro ao processar cancelamento:', erro);
     alert('Erro de conexão ao tentar cancelar. Tente novamente.');
-
   }
-}
-/**
- * 5. Fazer Logout da Conta
- */
-function fazerLogout() {
-  localStorage.removeItem('odivelas_usuario_logado');
-  window.location.href = 'login.html';
 }
