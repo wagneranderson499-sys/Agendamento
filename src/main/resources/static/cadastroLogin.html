@@ -66,7 +66,7 @@
         </div>
       </a>
 
-      <a href="home.html"
+      <a href="agendamento.html"
         class="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition text-zinc-300 font-bold uppercase tracking-wider text-xs px-4 py-2.5 rounded-xl flex items-center gap-2">
         <i class="fa-solid fa-arrow-left text-xs"></i>
         <span>Voltar</span>
@@ -88,12 +88,12 @@
       <div id="cardLogin" class="space-y-6">
         <div class="text-center">
           <span class="border border-yellow-500/30 text-yellow-500 text-[10px] uppercase tracking-[3px] px-3 py-1 rounded-full bg-yellow-500/5 inline-block mb-3 font-semibold">
-            ✦ Bem-vindo de volta
+            ✦ Bem-vindo de volta HS!
           </span>
           <h2 class="font-title text-2xl md:text-3xl font-black uppercase leading-tight">
-            ENTRAR NA <span class="text-gradient-red block">CONTA</span>
+            ENTRAR NA <span class="text-gradient-red block">CONTA ADMIN</span>
           </h2>
-          <p class="text-xs text-zinc-400 mt-2">Acesse sua conta para agendar e gerenciar horários.</p>
+          <p class="text-xs text-zinc-400 mt-2">Acesse sua conta de admin (Acesso restrito).</p>
         </div>
 
         <form id="formLogin" onsubmit="handleLogin(event)" class="space-y-4" novalidate>
@@ -118,9 +118,7 @@
             </div>
           </div>
 
-          <div class="flex justify-end">
-            <a href="#" onclick="solicitarRecuperacao()" class="text-xs text-yellow-500 hover:text-yellow-400 transition hover:underline">Esqueceu a senha?</a>
-          </div>
+      
 
           <button type="submit" id="btnSubmitLogin"
             class="w-full bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 transition-all duration-300 text-white py-3.5 rounded-xl shadow-lg shadow-red-950/60 flex items-center justify-center gap-2">
@@ -129,12 +127,7 @@
           </button>
         </form>
 
-        <div class="text-center border-t border-zinc-800/80 pt-4 text-xs text-zinc-400">
-          Ainda não tem uma conta? 
-          <button onclick="mudarTela('cadastro')" class="font-title font-black text-yellow-500 uppercase tracking-wider hover:underline ml-1">Criar conta</button>
-        </div>
-      </div>
-
+      
       <!-- ==================== FORMULÁRIO 2: CADASTRO ==================== -->
       <div id="cardCadastro" class="space-y-6 hidden">
         <div class="text-center">

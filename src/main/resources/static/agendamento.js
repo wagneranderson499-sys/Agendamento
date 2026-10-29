@@ -18,12 +18,20 @@ let usuarioLogado = null;
 const SEU_WHATSAPP_BARBEARIA = '5591991905836';
 
 document.addEventListener('DOMContentLoaded', () => {
-  verificarSessao();
+  // Não exige login para realizar um agendamento.
   carregarServicosDinâmicos();
   gerarCardsDias();
   atualizarPrecosServicosNaTela();
-});
 
+ // Se o cliente voltar do WhatsApp, mostra a confirmação.
+window.addEventListener('pageshow', () => {
+  if (
+    sessionStorage.getItem('odivelas_agendamento_confirmado') === 'true'
+  ) {
+    mostrarModalSucesso();
+  }
+});
+});
 // 1. FUNÇÕES DE HORÁRIO
 
 function converterHoraParaMinutos(hora) {
@@ -410,7 +418,24 @@ function selecionarHorario(elemento, hora) {
 
 // 10. CONFIRMA O AGENDAMENTO
 
-async function confirmarAgendamento() {
+let confirmacaoEmAndamento = false;
+let dadosParaConfirmacao = null;
+let agendamentoJaSalvo = false;
+function mostrarModalSucesso() {
+  const modal = document.getElementById('modalSucesso');
+
+  if (!modal) {
+    console.error('Modal de sucesso não encontrado no HTML.');
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function confirmarAgendamento() {
+  if (confirmacaoEmAndamento || agendamentoJaSalvo) return;
+
   if (!servicoSelecionado) {
     alert('Por favor, selecione um serviço/corte.');
     return;
@@ -426,92 +451,132 @@ async function confirmarAgendamento() {
     return;
   }
 
-  // Abre uma aba imediatamente para evitar o bloqueio de pop-ups.
-  const abaWhatsApp = window.open('about:blank', '_blank');
+  const nome = document.getElementById('clienteNome')?.value.trim() || '';
+  const telefoneInformado =
+    document.getElementById('clienteTelefone')?.value.trim() || '';
+  const telefone = telefoneInformado.replace(/\D/g, '');
 
-  let user = null;
-
-  try {
-    const { data } = await supabaseClient.auth.getUser();
-    user = data?.user || null;
-  } catch (err) {
-    console.log(
-      'Sessão do Supabase Auth não encontrada; verificando localStorage.'
-    );
-  }
-
-  const usuarioLocal =
-    JSON.parse(localStorage.getItem('odivelas_usuario_logado')) ||
-    usuarioLogado;
-
-  if (!user && !usuarioLocal) {
-    if (abaWhatsApp) abaWhatsApp.close();
-
-    alert(
-      'Sua sessão expirou ou você não está logado. Por favor, faça login para agendar.'
-    );
-
-    window.location.href = 'login.html';
+  if (nome.length < 2) {
+    alert('Informe seu nome para continuar.');
+    document.getElementById('clienteNome')?.focus();
     return;
   }
 
-  const meta = user?.user_metadata || {};
+  if (telefone.length < 10 || telefone.length > 13) {
+    alert('Informe um telefone/WhatsApp válido com DDD.');
+    document.getElementById('clienteTelefone')?.focus();
+    return;
+  }
 
-  const telefoneDoCadastro =
-    meta.telefone ||
-    meta.whatsapp ||
-    meta.celular ||
-    usuarioLocal?.telefone ||
-    usuarioLocal?.whatsapp ||
-    usuarioLocal?.celular ||
-    '(00) 00000-0000';
+  const partesData = dataSelecionada.split('-');
 
-  const nomeDoCadastro =
-    meta.nome ||
-    meta.full_name ||
-    usuarioLocal?.nome ||
-    'Cliente';
-
-  const clienteAtual = {
-    id: user ? user.id : (usuarioLocal?.id || 'USR-' + Date.now()),
-    nome: nomeDoCadastro,
-    telefone: telefoneDoCadastro,
-    email: user?.email || usuarioLocal?.email || 'cliente@odivelas.com'
+  dadosParaConfirmacao = {
+    barbeiro: barbeiroSelecionado,
+    servico: servicoSelecionado.nome,
+    preco: Number(servicoSelecionado.preco),
+    data: dataSelecionada,
+    dataFormatada: `${partesData[2]}/${partesData[1]}/${partesData[0]}`,
+    horario: horarioSelecionado,
+    nome,
+    telefone: telefoneInformado
   };
 
-  // Confere novamente a disponibilidade.
+  const campos = {
+    revisaoBarbeiro: dadosParaConfirmacao.barbeiro,
+    revisaoServico: dadosParaConfirmacao.servico,
+    revisaoData: dadosParaConfirmacao.dataFormatada,
+    revisaoHorario: dadosParaConfirmacao.horario,
+    revisaoNome: dadosParaConfirmacao.nome,
+    revisaoTelefone: dadosParaConfirmacao.telefone,
+    revisaoPreco: Number(dadosParaConfirmacao.preco).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    })
+  };
+
+  Object.entries(campos).forEach(([id, valor]) => {
+    const elemento = document.getElementById(id);
+    if (elemento) elemento.textContent = valor;
+  });
+
+  const modal = document.getElementById('modalRevisao');
+
+  if (!modal) {
+    alert('Não foi possível abrir a revisão do agendamento. Confira o HTML.');
+    return;
+  }
+
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+}
+
+function fecharModalRevisao() {
+  const modal = document.getElementById('modalRevisao');
+
+  if (modal) {
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+}
+
+async function confirmarAgendamentoDefinitivo() {
+  if (confirmacaoEmAndamento || agendamentoJaSalvo) return;
+
+  if (!dadosParaConfirmacao) {
+    alert('Revise os dados do agendamento antes de confirmar.');
+    fecharModalRevisao();
+    return;
+  }
+
+  confirmacaoEmAndamento = true;
+  const abaWhatsApp = window.open('about:blank', '_blank');
+  console.log('Aba do WhatsApp:', abaWhatsApp);
+
+  const botao = document.querySelector(
+    '#modalRevisao button[onclick="confirmarAgendamentoDefinitivo()"]'
+  );
+  const textoOriginal = botao?.textContent;
+
+  if (botao) {
+    botao.disabled = true;
+    botao.textContent = 'Confirmando...';
+  }
+
   try {
+    const dados = dadosParaConfirmacao;
+
+    // Verifica novamente se o horário continua disponível.
     const { data: agendamentosDb, error: erroAgendamentos } =
       await supabaseClient
         .from('agendamentos')
         .select('horario, status')
-        .eq('data', dataSelecionada)
+        .eq('data', dados.data)
         .neq('status', 'cancelado');
 
     if (erroAgendamentos) throw erroAgendamentos;
 
+    const { data: bloqueiosDb, error: erroBloqueios } =
+      await supabaseClient
+        .from('bloqueios')
+        .select('horario')
+        .eq('data', dados.data);
+
+    if (erroBloqueios) throw erroBloqueios;
+
     const conflitoAgendamento = (agendamentosDb || []).some(a =>
       a.horario &&
       horariosSeSobrepoem(
-        horarioSelecionado,
+        dados.horario,
         DURACAO_AGENDAMENTO_MINUTOS,
         a.horario,
         DURACAO_AGENDAMENTO_MINUTOS
       )
     );
 
-    const { data: bloqueiosDb, error: erroBloqueios } =
-      await supabaseClient
-        .from('bloqueios')
-        .select('horario')
-        .eq('data', dataSelecionada);
-
-    if (erroBloqueios) throw erroBloqueios;
-
     const conflitoBloqueio = (bloqueiosDb || []).some(b =>
       b.horario &&
       horariosSeSobrepoem(
-        horarioSelecionado,
+        dados.horario,
         DURACAO_AGENDAMENTO_MINUTOS,
         b.horario,
         DURACAO_AGENDAMENTO_MINUTOS
@@ -519,124 +584,127 @@ async function confirmarAgendamento() {
     );
 
     if (conflitoAgendamento || conflitoBloqueio) {
-      if (abaWhatsApp) abaWhatsApp.close();
+      fecharModalRevisao();
+      alert('Esse horário acabou de ficar indisponível. Escolha outro horário.');
 
-      alert(
-        'Esse horário acabou de ficar indisponível. Escolha outro horário, por favor.'
+      await carregarHorarios(dados.data);
+      return;
+    }
+
+    // O cliente não precisa estar autenticado.
+    // A coluna usuario_id precisa aceitar NULL para esta inserção.
+  const { error: erroSupa } = await supabaseClient
+  .from('agendamentos')
+  .insert([{
+    usuario_id: null,
+    cliente_nome: dados.nome,
+    cliente_telefone: dados.telefone.replace(/\D/g, ''),
+    barbeiro: dados.barbeiro,
+    servico_nome: dados.servico,
+    preco: dados.preco,
+    data: dados.data,
+    horario: dados.horario,
+    status: 'confirmado'
+  }]);
+
+if (erroSupa) throw erroSupa;
+
+    // Marca como salvo para evitar duplicidade por cliques repetidos.
+    agendamentoJaSalvo = true;
+
+    // Preserva o histórico local usado pelo restante do site.
+    try {
+      const agendamentosLocais = JSON.parse(
+        localStorage.getItem('odivelas_agendamentos') || '[]'
       );
 
-      await carregarHorarios(dataSelecionada);
-      return;
+      agendamentosLocais.push({
+        id: 'AGN-' + Date.now(),
+        clienteId: null,
+        clienteNome: dados.nome,
+        clienteTelefone: dados.telefone,
+        barbeiro: dados.barbeiro,
+        servico: dados.servico,
+        preco: dados.preco,
+        data: dados.data,
+        horario: dados.horario,
+        status: 'confirmado',
+        criadoEm: new Date().toISOString()
+      });
+
+      localStorage.setItem(
+        'odivelas_agendamentos',
+        JSON.stringify(agendamentosLocais)
+      );
+    } catch (erroLocal) {
+      console.warn('Não foi possível atualizar o histórico local:', erroLocal);
     }
-  } catch (err) {
-    console.error('Erro ao validar disponibilidade:', err);
 
-    if (abaWhatsApp) abaWhatsApp.close();
+    sessionStorage.setItem('odivelas_agendamento_confirmado', 'true');
 
-    alert(
-      'Não foi possível confirmar a disponibilidade. Tente novamente.'
-    );
+    fecharModalRevisao();
 
-    return;
-  }
+    const mensagem =
+      `Olá! Meu agendamento já foi registrado na Odivelas Barbearia.\n\n` +
+      `👤 Cliente: ${dados.nome}\n` +
+      `📱 Contato: ${dados.telefone}\n` +
+      `✂️ Serviço: ${dados.servico}\n` +
+      `💰 Preço: ${Number(dados.preco).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+      })}\n` +
+      `📅 Data: ${dados.dataFormatada}\n` +
+      `⏰ Horário: ${dados.horario}\n` +
+      `💈 Barbeiro: ${dados.barbeiro}`;
 
-  // Salva o agendamento no Supabase.
-  try {
-    const { error: erroSupa } = await supabaseClient
-      .from('agendamentos')
-      .insert([
-        {
-          usuario_id: clienteAtual.id,
-          cliente_nome: clienteAtual.nome,
-          cliente_telefone: clienteAtual.telefone,
-          servico_nome: servicoSelecionado.nome,
-          preco: parseFloat(servicoSelecionado.preco),
-          data: dataSelecionada,
-          horario: horarioSelecionado,
-          status: 'confirmado'
-        }
-      ]);
+    const linkZap =
+      `https://wa.me/${SEU_WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagem)}`;
 
-    if (erroSupa) {
-      console.error('Erro ao gravar no Supabase:', erroSupa.message);
-
-      if (abaWhatsApp) abaWhatsApp.close();
-
-      alert('Não foi possível salvar o agendamento: ' + erroSupa.message);
-      return;
-    }
-  } catch (err) {
-    console.error('Erro de conexão ao salvar no Supabase:', err);
-
-    if (abaWhatsApp) abaWhatsApp.close();
-
-    alert('Erro de conexão ao salvar o agendamento. Tente novamente.');
-    return;
-  }
-
-  // Mantém o histórico local.
-  const novoAgendamentoLocal = {
-    id: 'AGN-' + Date.now(),
-    clienteId: clienteAtual.id,
-    clienteNome: clienteAtual.nome,
-    clienteTelefone: clienteAtual.telefone,
-    clienteEmail: clienteAtual.email,
-    barbeiro: barbeiroSelecionado,
-    servico: servicoSelecionado.nome,
-    preco: servicoSelecionado.preco,
-    data: dataSelecionada,
-    horario: horarioSelecionado,
-    status: 'confirmado',
-    criadoEm: new Date().toISOString()
-  };
-
-  const agendamentosLocais =
-    JSON.parse(localStorage.getItem('odivelas_agendamentos')) || [];
-
-  agendamentosLocais.push(novoAgendamentoLocal);
-
-  localStorage.setItem(
-    'odivelas_agendamentos',
-    JSON.stringify(agendamentosLocais)
+// Abre o WhatsApp em outra aba e mantém o site aberto.
+if (abaWhatsApp && !abaWhatsApp.closed) {
+  abaWhatsApp.location.href = linkZap;
+} else {
+  alert(
+    'Seu agendamento foi registrado, mas o navegador bloqueou a abertura do WhatsApp. ' +
+    'Permita pop-ups para este site e tente novamente, ou abra o WhatsApp manualmente.'
   );
-
-  // Formata os dados para a mensagem.
-  const partesData = dataSelecionada.split('-');
-
-  const dataFormatada =
-    `${partesData[2]}/${partesData[1]}/${partesData[0]}`;
-
-  const precoFormatado =
-    Number(servicoSelecionado.preco).toFixed(2).replace('.', ',');
-
-  const mensagemWhatsApp =
-    `Olá! Acabei de fazer um agendamento na *Odivelas Barbearia*:\n\n` +
-    `👤 *Cliente:* ${clienteAtual.nome}\n` +
-    `📱 *Contato:* ${clienteAtual.telefone}\n` +
-    `✂️ *Serviço:* ${servicoSelecionado.nome} (R$ ${precoFormatado})\n` +
-    `📅 *Data:* ${dataFormatada}\n` +
-    `⏰ *Horário:* ${horarioSelecionado}\n` +
-    `💈 *Barbeiro:* ${barbeiroSelecionado}\n\n` +
-    `✅ Para consultar seu agendamento, volte ao sistema ` +
-    `Odivelas Barbearia e acesse a página "Meus Agendamentos".`;
-
-  const linkZap =
-    `https://wa.me/${SEU_WHATSAPP_BARBEARIA}?text=${encodeURIComponent(mensagemWhatsApp)}`;
-
-  // Abre o WhatsApp na aba preparada anteriormente.
-  if (abaWhatsApp) {
-    abaWhatsApp.location.href = linkZap;
-  } else {
-    // Alternativa caso o navegador tenha bloqueado a nova aba.
-    alert(
-      'Seu agendamento foi salvo! Se o WhatsApp não abrir automaticamente, ' +
-      'permita pop-ups para este site e tente novamente.'
-    );
-  }
-
-  // Retorna a página original ao histórico.
-  window.location.href = 'meus-agendamentos.html';
 }
+
+    if (!abaWhatsApp) {
+      alert(
+        'Seu agendamento foi registrado! O navegador bloqueou o WhatsApp. Abra o WhatsApp manualmente para entrar em contato com a barbearia.'
+      );
+    }
+
+
+
+    await carregarHorarios(dados.data);
+
+  } catch (err) {
+    console.error('Erro ao confirmar agendamento:', err);
+    console.error('Detalhes do erro:', {
+      message: err?.message,
+      code: err?.code,
+      details: err?.details,
+      hint: err?.hint
+    });
+
+    alert(
+      `Não foi possível registrar o agendamento.\n\nMotivo: ${
+        err?.message || 'Erro desconhecido. Consulte o Console (F12).'
+      }`
+    );
+  } finally {
+    confirmacaoEmAndamento = false;
+
+    if (botao) {
+      botao.disabled = false;
+      botao.textContent = textoOriginal || 'Confirmar agendamento';
+    }
+  }
+}
+
+
 
 
 // 11. BUSCA OS SERVIÇOS E PREÇOS DO SUPABASE
