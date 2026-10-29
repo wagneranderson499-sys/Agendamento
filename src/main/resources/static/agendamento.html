@@ -378,115 +378,194 @@
                   2. Selecione o Corte / Serviço
                 </label>
 
-                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4" id="listaServicos">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 items-start" id="listaServicos">
 
-                  <button type="button" data-nome="Degradê" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="degradê.jpg" alt="Degradê" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Degradê</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte moderno com acabamento preciso.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
-                  </button>
+  <!-- DEGRADÊ -->
+  <button type="button" data-nome="Degradê" data-preco="20"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="degradê.jpg" alt="Degradê" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Degradê</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte moderno com acabamento preciso.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
+  </button>
 
-                  <button type="button" data-nome="Navalhado" data-preco="25" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="coetenavalhado.jpg" alt="Navalhado" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Navalhado</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento refinado na navalha.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
-                  </button>
+  <!-- NAVALHADO -->
+  <button type="button" data-nome="Navalhado" data-preco="25"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="coetenavalhado.jpg" alt="Navalhado" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Navalhado</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento refinado na navalha.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
+  </button>
 
-                  <button type="button" data-nome="Barba" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="apenasBarba.jpeg" alt="Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Barba</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Modelagem profissional e alinhada.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
-                  </button>
+  <!-- BARBA -->
+  <button type="button" data-nome="Barba" data-preco="20"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="apenasBarba.jpeg" alt="Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Barba</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Modelagem profissional e alinhada.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
+  </button>
 
-                  <button type="button" data-nome="Americano" data-preco="5" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="americano.jpeg" alt="Americano" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Americano</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento discreto e moderno.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 5,00</span>
-                  </button>
+  <!-- AMERICANO -->
+  <button type="button" data-nome="Americano" data-preco="5"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="americano.jpeg" alt="Americano" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Americano</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Acabamento discreto e moderno.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 5,00</span>
+  </button>
 
-                  <button type="button" data-nome="Social" data-preco="20" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="social.jpeg" alt="Social" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Social</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte elegante para qualquer ocasião.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
-                  </button>
+  <!-- SOCIAL -->
+  <button type="button" data-nome="Social" data-preco="20"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="social.jpeg" alt="Social" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Social</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte elegante para qualquer ocasião.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 20,00</span>
+  </button>
 
-                  <button type="button" data-nome="Corte + Barba" data-preco="35" onclick="selecionarServico(this)"
-                    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-                    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-                      <img src="corte+barba.jpeg" alt="Corte + Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                    </div>
-                    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Corte + Barba</span>
-                    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Pacote completo premium.</span>
-                    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 35,00</span>
-                  </button>
+  <!-- CORTE + BARBA -->
+  <button type="button" data-nome="Corte + Barba" data-preco="35"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="corte+barba.jpeg" alt="Corte + Barba" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Corte + Barba</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Pacote completo, com eficiéncia premium.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 35,00</span>
+  </button>
 
-                  <!-- CORTE MOICANO -->
-<button type="button" data-nome="Corte moicano" data-preco="25"
-  onclick="selecionarServico(this)"
-  class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+  <!-- CORTE MOICANO -->
+  <button type="button" data-nome="Corte moicano" data-preco="25"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="moicano.jpeg" alt="Corte moicano" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Corte moicano</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte moicano com acabamento preciso.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
+  </button>
 
+  <!-- LOW FADE -->
+  <button type="button" data-nome="Low fade" data-preco="25"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="lowfade.jpeg" alt="Low fade" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Low fade</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Degradê baixo com acabamento moderno.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
+  </button>
+
+
+<!-- PLATINADO -->
+<div class="w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 rounded-xl overflow-hidden text-left p-2 sm:p-3">
   <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-    <img src="moicano.jpeg" alt="Corte moicano"
-      class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    <img src="luzes.jpg" alt="Platinado" class="w-full h-full object-cover">
   </div>
 
-  <span class="block font-bold uppercase text-xs sm:text-sm text-white">
-    Corte moicano
-  </span>
+  <span class="block font-bold uppercase text-xs sm:text-sm text-white">Luzes e Platinado</span>
+  <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Transformação do visual com efeito platinado.</span>
+  <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 80,00</span>
 
-  <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">
-    Corte moicano com acabamento preciso.
-  </span>
+  <p class="text-zinc-500 text-[10px] sm:text-xs mt-3 mb-2">
+    Agendamento direto com o barbeiro pelo WhatsApp.
+  </p>
 
-  <span class="text-yellow-500 font-bold text-sm sm:text-base">
-    R$ 25,00
-  </span>
-</button>
+  <a href="https://wa.me/5591991905836?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20Platinado."
+    target="_blank" rel="noopener noreferrer"
+    class="inline-flex items-center gap-1.5 rounded-lg bg-green-600/15 border border-green-600/30 hover:bg-green-600 text-green-500 hover:text-white text-[10px] sm:text-xs font-bold px-2.5 py-2 transition">
+    <i class="fa-brands fa-whatsapp"></i>
+    Agendar pelo WhatsApp
+  </a>
+</div>
 
-<!-- LOW FADE -->
-<button type="button" data-nome="Low fade" data-preco="25"
-  onclick="selecionarServico(this)"
-  class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
-
+<!-- SELAGEM -->
+<div class="w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 rounded-xl overflow-hidden text-left p-2 sm:p-3">
   <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
-    <img src="lowfade.jpeg" alt="Low fade"
-      class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    <img src="selagem.jpg" alt="Selagem" class="w-full h-full object-cover">
   </div>
 
-  <span class="block font-bold uppercase text-xs sm:text-sm text-white">
-    Low fade
-  </span>
+  <span class="block font-bold uppercase text-xs sm:text-sm text-white">Selagem</span>
+  <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Tratamento para reduzir o volume e alinhar os fios.</span>
+  <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 80,00</span>
 
-  <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">
-    Degradê baixo com acabamento moderno.
-  </span>
+  <p class="text-zinc-500 text-[10px] sm:text-xs mt-3 mb-2">
+    Agendamento direto com o barbeiro pelo WhatsApp.
+  </p>
 
-  <span class="text-yellow-500 font-bold text-sm sm:text-base">
-    R$ 25,00
-  </span>
+  <a href="https://wa.me/5591991905836?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20Selagem."
+    target="_blank" rel="noopener noreferrer"
+    class="inline-flex items-center gap-1.5 rounded-lg bg-green-600/15 border border-green-600/30 hover:bg-green-600 text-green-500 hover:text-white text-[10px] sm:text-xs font-bold px-2.5 py-2 transition">
+    <i class="fa-brands fa-whatsapp"></i>
+    Agendar pelo WhatsApp
+  </a>
+</div>
+  <!-- BUZZ CUT -->
+  <button type="button" data-nome="Buzz cut" data-preco="25"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative w-full min-w-0 self-start border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3">
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+      <img src="buzz cut.jpg" alt="Buzz cut" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+    </div>
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">Buzz cut</span>
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">Corte bem curto.</span>
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">R$ 25,00</span>
+  </button>
+
+  <!-- Corte Infantil -->
+<button
+    type="button"
+    data-nome="Infantil"
+    data-preco="25"
+    onclick="selecionarServico(this)"
+    class="servico-btn group relative border border-zinc-800 bg-zinc-950/60 hover:border-red-600 transition-all rounded-xl overflow-hidden text-left p-2 sm:p-3"
+>
+    <!-- Imagem do corte -->
+    <div class="w-full h-28 sm:h-32 md:h-36 overflow-hidden rounded-lg mb-3">
+        <img
+            src="infantil.jpg"
+            alt="Corte infantil masculino"
+            class="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+        >
+    </div>
+
+    <!-- Nome do serviço -->
+    <span class="block font-bold uppercase text-xs sm:text-sm text-white">
+        Infantil
+    </span>
+
+    <!-- Descrição -->
+    <span class="text-zinc-500 text-xs block mb-2 line-clamp-2">
+        Corte infantil.
+    </span>
+
+    <!-- Preço -->
+    <span class="text-yellow-500 font-bold text-sm sm:text-base">
+        R$ 25,00
+    </span>
 </button>
 
-                </div>
+</div>
               </div>
 
               <!-- 3. DATA E HORÁRIO -->
