@@ -429,8 +429,9 @@ function mostrarModalSucesso() {
     return;
   }
 
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+modal.classList.remove('modal-fechado', 'hidden');
+modal.classList.add('flex');
+modal.setAttribute('aria-hidden', 'false');
 }
 
 function confirmarAgendamento() {
@@ -505,17 +506,17 @@ function confirmarAgendamento() {
     alert('Não foi possível abrir a revisão do agendamento. Confira o HTML.');
     return;
   }
-
-  modal.classList.remove('hidden');
-  modal.classList.add('flex');
+abrirModal('modalRevisao');
 }
 
 function fecharModalRevisao() {
   const modal = document.getElementById('modalRevisao');
 
   if (modal) {
-    modal.classList.add('hidden');
-    modal.classList.remove('flex');
+     modal.classList.remove('modal-fechado', 'hidden');
+  modal.classList.add('flex');
+  modal.setAttribute('aria-hidden', 'false');
+
   }
 }
 
@@ -766,3 +767,21 @@ async function atualizarPrecosServicosNaTela() {
     }
   });
 }
+
+function redirecionarParaMeusAgendamentos() {
+  if (
+    sessionStorage.getItem('odivelas_agendamento_confirmado') === 'true' &&
+    document.visibilityState === 'visible'
+  ) {
+    sessionStorage.removeItem('odivelas_agendamento_confirmado');
+    window.location.href = 'meus-agendamentos.html';
+  }
+}
+
+document.addEventListener('visibilitychange', () => {
+  redirecionarParaMeusAgendamentos();
+});
+
+window.addEventListener('focus', () => {
+  redirecionarParaMeusAgendamentos();
+});
