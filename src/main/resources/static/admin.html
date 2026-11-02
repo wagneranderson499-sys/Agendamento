@@ -8,6 +8,15 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <title>Painel Admin - Odivelas Barbearia</title>
+
+  <!-- PWA & Mobile Configuration -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#dc2626">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Admin Odivelas">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <style>
     /* Oculta scrollbar na navegação mobile sem tirar a funcionalidade */
     .no-scrollbar::-webkit-scrollbar { display: none; }
@@ -166,6 +175,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase-client.js"></script>
   <script src="admin.js"></script>
+  <script src="pwa-install.js"></script>
 </body>
 
 </html>
